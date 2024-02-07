@@ -6,6 +6,9 @@
   <script src="https://kit.fontawesome.com/f7310fb2c0.js" crossorigin="anonymous"></script>
   <link href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
 <style>
     #map { position: absolute; top: 0; bottom: 0; height: 300px; }
     </style>
@@ -13,14 +16,19 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Roboto", sans-serif;
+      font-weight: 300;
     }
     .grid-container {
       display: grid;
 	  grid-template-columns: 4fr 2fr;
     }
 
-
+    .sensor-data-grid {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: 2fr 2fr 2fr;
+}
     .grid-item {
       border: 1px solid #ddd;
     }
@@ -36,7 +44,11 @@
     .grid-item i {
     font-size: 32px;
 }
-
+.sensor-data-block {
+    border: 1px solid #ccc;
+    text-align: center;
+    padding: 14px;
+}
 
     .slider {
       width: 80%;
@@ -59,8 +71,8 @@
 
   <div class="grid-container">
     <div class="left-grid-subcontainer">
-		<div class="grid-item" style="height: 446px;">
-			<iframe width="100%" height="446" src="https://www.youtube.com/embed/1ZmYX5nVwLc?si=Xq6evGoaQga1UwYk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+		<div class="grid-item">
+			<iframe width="100%" height="300" src="https://www.youtube.com/embed/1ZmYX5nVwLc?si=Xq6evGoaQga1UwYk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 		</div>
 		<div class="grid-item" id="map-container">
         </div>
@@ -78,19 +90,38 @@
 		</div>
 		  <input type="range" class="slider" value="50" />
 		</div>
-		<div class="grid-item">
-            <i class="fa-solid fa-head-side-mask"></i>
-            <i class="fa-solid fa-temperature-low"></i>
-            <i class="fa-solid fa-sun"></i>
-            <i class="fa-solid fa-gauge-high"></i>
-            <i class="fa-solid fa-location-crosshairs"></i>
-            <i class="fa-solid fa-wind"></i>
-			Atmospheric pressure: 300KPa<br>
-			Temperature: 300KPa<br>
-			Brightness: 300KPa<br>
-			Speed: 300KPa<br>
-			Air quality: 300KPa<br>
-			CO concentration: 300KPa<br>
+		<div class="grid-item sensor-data-grid">
+            <div class="sensor-data-block">
+                <i class="fa-solid fa-temperature-low"></i>
+                <div class="sensor-data-block-title">Temperature</div>
+                <div style="font-size:30px;font-weight: 700;">21 °C</div>
+            </div>
+            <div class="sensor-data-block">
+                <i class="fa-solid fa-wind"></i>
+                <div class="sensor-data-block-title">Atmospheric pressure</div>
+                <div style="font-size:23px;font-weight: 700;">101,325 Pa</div>
+                
+            </div>
+            <div class="sensor-data-block">
+                <i class="fa-solid fa-sun"></i>
+                <div class="sensor-data-block-title">Brightness</div>
+                <div style="font-size:30px;font-weight: 700;">808 lm</div>
+            </div>
+            <div class="sensor-data-block">
+                <i class="fa-solid fa-gauge-high"></i>
+                <div class="sensor-data-block-title">Speed</div>
+                <div style="font-size:30px;font-weight: 700;">2 m/s</div>
+            </div>
+            <div class="sensor-data-block">
+                <i class="fa-solid fa-head-side-mask"></i>
+                <div class="sensor-data-block-title">Air quality</div>
+                <div style="font-size:30px;font-weight: 700;">0.8</div>
+            </div>
+            <div class="sensor-data-block">
+                <i class="fa-solid fa-location-crosshairs"></i>
+                <div class="sensor-data-block-title">Geolocation</div>
+                <div style="font-size:30px;font-weight: 700;">21 °C</div>
+            </div>
 		</div>
 	</div>
     <div class="right-grid-subcontainer">
@@ -136,7 +167,7 @@
     const updateSource = setInterval(async () => {
         const geojson = await getLocation(updateSource);
         map.getSource('iss').setData(geojson);
-    }, 200);
+    }, 2000);
     
     async function getLocation(updateSource) {
         // Make a GET request to the API and return the location of the ISS.
