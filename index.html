@@ -3,56 +3,122 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real-Time Data Display</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .grid-container {
+      display: grid;
+	  grid-template-columns: 4fr 2fr;
+    }
+
+
+    .grid-item {
+      padding: 20px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+	.left-grid-subcontainer{
+		display: grid;
+	    grid-template-columns: 2fr 2fr;
+		grid-template-rows: repeat(2, 1fr);
+	}
+	.right-grid-subcontainer{
+	    display: grid;
+	}
+
+
+
+    .slider {
+      width: 80%;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+	
+
+.row
+{
+	display: inline-flex;
+	clear: both;
+}
+.columnLateral
+{
+  float: left;
+  width: 15%;
+  min-width: 300px;
+}
+.columnCetral
+{
+  float: left;
+  width: 70%;
+  min-width: 300px;
+}
+#joy2Div
+{
+	width:200px;
+	height:200px;
+	margin:50px
+}
+#joystick
+{
+	border: 1px solid #FF0000;
+}
+#joystick2
+{
+	border: 1px solid #0000FF;
+}
+  </style>
+  <script src="joy.js"></script>
 </head>
 <body>
-  <h1>Real-Time Data Display</h1>
-  
-  <div id="data-container">
-    <p id="temperature">Temperature: N/A</p>
-    <p id="pressure">Pressure: N/A</p>
-    <!-- Add other variables here -->
+
+  <div class="grid-container">
+    <div class="left-grid-subcontainer">
+		<div class="grid-item">Block 1</div>
+		<div class="grid-item">
+			Block 2
+		</div>
+		<div class="grid-item">
+				  		<div class="row">
+			<div class="columnLateral">
+				<div id="joy1Div" style="width:200px;height:200px;margin:50px"></div>
+				Posizione X:<input id="joy1PosizioneX" type="text" /><br />
+				Posizione Y:<input id="joy1PosizioneY" type="text" /><br />
+				Direzione:<input id="joy1Direzione" type="text" /><br />
+				X :<input id="joy1X" type="text" /></br>
+				Y :<input id="joy1Y" type="text" />
+			</div>
+		
+		</div>
+		  <input type="range" class="slider" value="50" />
+		</div>
+		<div class="grid-item">Block 4</div>
+	</div>
+    <div class="right-grid-subcontainer">
+		<div class="grid-item">Block 5</div>
+	</div>
   </div>
 
-  <script>
-    // EventSource to listen for server-sent events
-    const eventSource = new EventSource('/events');
 
-    // Update data on receiving server-sent events
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      document.getElementById('temperature').innerText = `Temperature: ${data.temperature}`;
-      document.getElementById('pressure').innerText = `Pressure: ${data.pressure}`;
-      // Update other variables here
-    };
-  </script>
+		<script type="text/javascript">
 
-  <script>
-    // Function to send data to the server
-    const sendData = async () => {
-      const newData = {
-        temperature: parseFloat(prompt('Enter Temperature:')),
-        pressure: parseFloat(prompt('Enter Pressure:')),
-        // Add other variables here
-      };
+var joy1IinputPosX = document.getElementById("joy1PosizioneX");
+var joy1InputPosY = document.getElementById("joy1PosizioneY");
+var joy1Direzione = document.getElementById("joy1Direzione");
+var joy1X = document.getElementById("joy1X");
+var joy1Y = document.getElementById("joy1Y");
 
-      try {
-        const response = await fetch('/api/updateData', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(newData),
-        });
+var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
+    joy1IinputPosX.value = stickData.xPosition;
+    joy1InputPosY.value = stickData.yPosition;
+    joy1Direzione.value = stickData.cardinalDirection;
+    joy1X.value = stickData.x;
+    joy1Y.value = stickData.y;
+});
 
-        const result = await response.json();
-        console.log(result);
-      } catch (error) {
-        console.error('Error sending data:', error);
-      }
-    };
-  </script>
-
-  <button onclick="sendData()">Send Data to Server</button>
+		</script>
 </body>
 </html>
