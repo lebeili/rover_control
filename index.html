@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
     }
-
     .grid-container {
       display: grid;
 	  grid-template-columns: 4fr 2fr;
@@ -16,9 +16,7 @@
 
 
     .grid-item {
-      padding: 20px;
       border: 1px solid #ddd;
-      text-align: center;
     }
 
 	.left-grid-subcontainer{
@@ -39,37 +37,13 @@
     }
 	
 
-.row
+
+#joy1Div
 {
-	display: inline-flex;
-	clear: both;
+	width:100%;
 }
-.columnLateral
-{
-  float: left;
-  width: 15%;
-  min-width: 300px;
-}
-.columnCetral
-{
-  float: left;
-  width: 70%;
-  min-width: 300px;
-}
-#joy2Div
-{
-	width:200px;
-	height:200px;
-	margin:50px
-}
-#joystick
-{
-	border: 1px solid #FF0000;
-}
-#joystick2
-{
-	border: 1px solid #0000FF;
-}
+
+
   </style>
   <script src="joy.js"></script>
 </head>
@@ -77,14 +51,16 @@
 
   <div class="grid-container">
     <div class="left-grid-subcontainer">
-		<div class="grid-item">Block 1</div>
+		<div class="grid-item" style="height: 446px;">
+			<iframe width="100%" height="446" src="https://www.youtube.com/embed/1ZmYX5nVwLc?si=Xq6evGoaQga1UwYk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+		</div>
 		<div class="grid-item">
-			Block 2
+			<iframe width='100%' height='100%' src="https://api.mapbox.com/styles/v1/lebedei/clsbx922m00ck01qzc9cc42q1.html?title=false&access_token=pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w&zoomwheel=false#13.84/60.17619/24.80732" title="Streets" style="border:none;"></iframe>
 		</div>
 		<div class="grid-item">
 				  		<div class="row">
 			<div class="columnLateral">
-				<div id="joy1Div" style="width:200px;height:200px;margin:50px"></div>
+				<div id="joy1Div" style="width:200px;height:200px;"></div>
 				Posizione X:<input id="joy1PosizioneX" type="text" /><br />
 				Posizione Y:<input id="joy1PosizioneY" type="text" /><br />
 				Direzione:<input id="joy1Direzione" type="text" /><br />
@@ -95,10 +71,19 @@
 		</div>
 		  <input type="range" class="slider" value="50" />
 		</div>
-		<div class="grid-item">Block 4</div>
+		<div class="grid-item">
+			Atmospheric pressure: 300KPa<br>
+			Temperature: 300KPa<br>
+			Brightness: 300KPa<br>
+			Speed: 300KPa<br>
+			Air quality: 300KPa<br>
+			CO concentration: 300KPa<br>
+		</div>
 	</div>
     <div class="right-grid-subcontainer">
-		<div class="grid-item">Block 5</div>
+		<div class="grid-item">
+			<iframe width='100%' height='100%' src="https://api.mapbox.com/styles/v1/lebedei/clsbx922m00ck01qzc9cc42q1.html?title=false&access_token=pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w&zoomwheel=false#13.84/60.17619/24.80732" title="Streets" style="border:none;"></iframe>
+		</div>
 	</div>
   </div>
 
@@ -120,5 +105,6 @@ var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
 });
 
 		</script>
+
 </body>
 </html>
