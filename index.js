@@ -1,23 +1,35 @@
 const express = require('express');
+const basicAuth = require('express-basic-auth');
 const path = require('path');
 const bodyParser = require('body-parser');
 const { EventEmitter } = require('events');
 
 const app = express();
 const port = 80;
-
+const users = { 'blabla': '228228' };
 // Create an EventEmitter to handle SSE connections
 const eventEmitter = new EventEmitter();
 
 // Middleware to parse JSON data
 app.use(bodyParser.json());
 
+const basicAuthMiddleware = basicAuth({
+    users: users,
+    challenge: true, // Show pop-up window for authentication
+    unauthorizedResponse: 'Unauthorized Access!', // Custom unauthorized response
+  });
+  
+  // Use basicAuthMiddleware for the path you want to protect
+  app.use('/rover', basicAuthMiddleware);
+  
+
+
 // Serve static files (HTML, JS, CSS, etc.)
 app.use(express.static(path.join(__dirname, '')));
 
 // Serve the HTML page for the root path
 app.get('/rover', (req, res) => {
-  res.sendFile(path.join(__dirname, '', 'index.html'));
+  res.sendFile(path.join(__dirname, '', 'rover.html'));
 });
 
 // SSE endpoint to send real-time updates

@@ -114,7 +114,7 @@ void loop() {
 
     Serial.print("[HTTP] POST...\n");
     // start connection and send HTTP header and body
-    int httpCode = http.POST("{\"temperature\":\""+String(bmp.readTemperature())+"\"}");
+    int httpCode = http.POST("{\"temperature\":\""+String(bmp.readTemperature())+"\",\"pressure\":\""+String(bmp.readPressure())+"\",\"location\":\""+String(gps.location.lat(),6)+","+String(gps.location.lng(),6)+"\"}");
 
     // httpCode will be negative on error
     if (httpCode > 0) {
