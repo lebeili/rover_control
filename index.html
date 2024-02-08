@@ -18,6 +18,7 @@
       margin: 0;
       font-family: "Roboto", sans-serif;
       font-weight: 300;
+      color: #505050;
     }
     .grid-container {
       display: grid;
@@ -45,9 +46,11 @@
     font-size: 32px;
 }
 .sensor-data-block {
-    border: 1px solid #ccc;
+    border: 0.5px solid #ccc;
     text-align: center;
     padding: 14px;
+    display: grid;
+    grid-template-rows: 1fr 1fr 1fr;
 }
 
     .slider {
@@ -62,7 +65,10 @@
 {
 	width:100%;
 }
-
+.sensor-data-block-unit{
+    font-weight: 300;
+    font-size: 23px;
+}
 
   </style>
   <script src="joy.js"></script>
@@ -75,52 +81,72 @@
 			<iframe width="100%" height="300" src="https://www.youtube.com/embed/1ZmYX5nVwLc?si=Xq6evGoaQga1UwYk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 		</div>
 		<div class="grid-item" id="map-container">
+
         </div>
 		<div class="grid-item">
-				  		<div class="row">
+            <input type="range" class="slider" value="50" />
 			<div class="columnLateral">
 				<div id="joy1Div" style="width:200px;height:200px;"></div>
-				Posizione X:<input id="joy1PosizioneX" type="text" /><br />
-				Posizione Y:<input id="joy1PosizioneY" type="text" /><br />
-				Direzione:<input id="joy1Direzione" type="text" /><br />
+				<input id="joy1PosizioneX" type="hidden" /><br />
+				<input id="joy1PosizioneY" type="hidden" /><br />
+				<input id="joy1Direzione" type="hidden" /><br />
+                <i class="fa-solid fa-arrow-up-long"></i>
+                <i class="fa-solid fa-arrow-down-long"></i>
+                <i class="fa-solid fa-arrow-left-long"></i>
+                <i class="fa-solid fa-arrow-right-long"></i>
 				X :<input id="joy1X" type="text" /></br>
 				Y :<input id="joy1Y" type="text" />
 			</div>
-		
-		</div>
-		  <input type="range" class="slider" value="50" />
 		</div>
 		<div class="grid-item sensor-data-grid">
             <div class="sensor-data-block">
                 <i class="fa-solid fa-temperature-low"></i>
                 <div class="sensor-data-block-title">Temperature</div>
-                <div style="font-size:30px;font-weight: 700;">21 °C</div>
+                <div style="font-size:30px;font-weight: 700;">
+                    <span class="sensor-data-block-value">21</span>
+                    <span class="sensor-data-block-unit">°C</span>
+                </div>
             </div>
             <div class="sensor-data-block">
                 <i class="fa-solid fa-wind"></i>
-                <div class="sensor-data-block-title">Atmospheric pressure</div>
-                <div style="font-size:23px;font-weight: 700;">101,325 Pa</div>
+                <div class="sensor-data-block-title" style="font-size: 15px;">Atmospheric pressure</div>
+                <div style="font-size:23px;font-weight: 700;">
+                    <span class="sensor-data-block-value">101325</span>
+                    <span class="sensor-data-block-unit">Pa</span>
+                </div>
                 
             </div>
             <div class="sensor-data-block">
                 <i class="fa-solid fa-sun"></i>
                 <div class="sensor-data-block-title">Brightness</div>
-                <div style="font-size:30px;font-weight: 700;">808 lm</div>
+                <div style="font-size:30px;font-weight: 700;">
+                    <span class="sensor-data-block-value">808</span>
+                    <span class="sensor-data-block-unit">lm</span>
+                </div>
             </div>
             <div class="sensor-data-block">
                 <i class="fa-solid fa-gauge-high"></i>
                 <div class="sensor-data-block-title">Speed</div>
-                <div style="font-size:30px;font-weight: 700;">2 m/s</div>
+                <div style="font-size:30px;font-weight: 700;">
+                    <span class="sensor-data-block-value">2</span>
+                    <span class="sensor-data-block-unit">m/s</span>
+                </div>
             </div>
             <div class="sensor-data-block">
                 <i class="fa-solid fa-head-side-mask"></i>
                 <div class="sensor-data-block-title">Air quality</div>
-                <div style="font-size:30px;font-weight: 700;">0.8</div>
+                <div style="font-size:30px;font-weight: 700;">
+                    <span class="sensor-data-block-value">0.8</span>
+                    <span class="sensor-data-block-unit"></span>
+                </div>
             </div>
             <div class="sensor-data-block">
                 <i class="fa-solid fa-location-crosshairs"></i>
                 <div class="sensor-data-block-title">Geolocation</div>
-                <div style="font-size:30px;font-weight: 700;">21 °C</div>
+                <div style="font-size:30px;font-weight: 700;">
+                    <span class="sensor-data-block-value">21</span>
+                    <span class="sensor-data-block-unit">°C</span>
+                </div>
             </div>
 		</div>
 	</div>

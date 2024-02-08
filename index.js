@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '')));
 
 // Serve the HTML page for the root path
-app.get('/', (req, res) => {
+app.get('/rover', (req, res) => {
   res.sendFile(path.join(__dirname, '', 'index.html'));
 });
 
