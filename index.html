@@ -141,7 +141,7 @@
                 <i class="fa-solid fa-temperature-low"></i>
                 <div class="sensor-data-block-title">Temperature</div>
                 <div style="font-size:30px;font-weight: 700;">
-                    <span class="sensor-data-block-value">21</span>
+                    <span id="temperature_value" class="sensor-data-block-value">21</span>
                     <span class="sensor-data-block-unit">°C</span>
                 </div>
             </div>
@@ -149,7 +149,7 @@
                 <i class="fa-solid fa-wind"></i>
                 <div class="sensor-data-block-title" style="font-size: 15px;">Atmospheric pressure</div>
                 <div style="font-size:23px;font-weight: 700;">
-                    <span class="sensor-data-block-value">101325</span>
+                    <span id="pressure_value" class="sensor-data-block-value">101325</span>
                     <span class="sensor-data-block-unit">Pa</span>
                 </div>
                 
@@ -158,7 +158,7 @@
                 <i class="fa-solid fa-sun"></i>
                 <div class="sensor-data-block-title">Brightness</div>
                 <div style="font-size:30px;font-weight: 700;">
-                    <span class="sensor-data-block-value">808</span>
+                    <span id="brightness_value" class="sensor-data-block-value">808</span>
                     <span class="sensor-data-block-unit">lm</span>
                 </div>
             </div>
@@ -166,7 +166,7 @@
                 <i class="fa-solid fa-gauge-high"></i>
                 <div class="sensor-data-block-title">Speed</div>
                 <div style="font-size:30px;font-weight: 700;">
-                    <span class="sensor-data-block-value">2</span>
+                    <span id="speed_value" class="sensor-data-block-value">2</span>
                     <span class="sensor-data-block-unit">m/s</span>
                 </div>
             </div>
@@ -182,7 +182,7 @@
                 <i class="fa-solid fa-location-crosshairs"></i>
                 <div class="sensor-data-block-title">Geolocation</div>
                 <div style="font-size:30px;font-weight: 700;">
-                    <span class="sensor-data-block-value">21</span>
+                    <span id="location_value" class="sensor-data-block-value">21</span>
                     <span class="sensor-data-block-unit">°C</span>
                 </div>
             </div>
@@ -194,6 +194,21 @@
 		</div>
 	</div>
   </div>
+
+  <script>
+    // EventSource to listen for server-sent events
+    const eventSource = new EventSource('/events');
+
+    // Update data on receiving server-sent events
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      document.getElementById('temperature_value').innerText = `${data.temperature}`;
+      document.getElementById('pressure_value').innerText = `${data.pressure}`;
+      document.getElementById('brightness_value').innerText = `${data.brightness}`;
+      document.getElementById('speed_value').innerText = `${data.speed}`;
+      document.getElementById('location_value').innerText = `${data.location}`;
+    };
+  </script>
 
   <script>
 	mapboxgl.accessToken = 'pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w';

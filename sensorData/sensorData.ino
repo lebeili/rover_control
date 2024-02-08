@@ -1,6 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
-#define SERVER_IP "192.168.10.34:3000"
+#define SERVER_IP "109.204.233.11:80"
 #ifndef STASSID
 #define STASSID "Koti_50EC"
 #define STAPSK "CHKN7FE74YAYJ"
