@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const { EventEmitter } = require('events');
 
 const app = express();
-const port = 3000;
+const port = 80;
 
 // Create an EventEmitter to handle SSE connections
 const eventEmitter = new EventEmitter();
