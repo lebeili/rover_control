@@ -72,7 +72,35 @@
     font-weight: 300;
     font-size: 23px;
 }
+    .joystick-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+    }
 
+    .joystick-body-container {
+      grid-column: span 3;
+      grid-row: span 3;
+    }
+
+    .joystick-controlsinfo-container{
+      width: 100%;
+      display: grid;
+    }
+
+    .right-controls {
+        grid-column: span 1;
+    grid-row: span 3;
+    }
+
+    .bottom-controls {
+        grid-row: span 1;
+    grid-column: span 3;
+    grid-template-columns: repeat(3, 1fr);
+    }
+.joystick-controlsinfo-container div{
+    margin:auto;
+}
   </style>
   <script src="joy.js"></script>
 </head>
@@ -88,18 +116,25 @@
         </div>
 		<div class="grid-item">
             <input type="range" class="slider" value="50" />
-			<div class="columnLateral">
-				<div id="joy1Div" style="width:200px;height:200px;"></div>
-				<input id="joy1PosizioneX" type="hidden" /><br />
-				<input id="joy1PosizioneY" type="hidden" /><br />
-				<input id="joy1Direzione" type="hidden" /><br />
-                <i class="fa-solid fa-arrow-up-long"></i>
-                <i class="fa-solid fa-arrow-down-long"></i>
-                <i class="fa-solid fa-arrow-left-long"></i>
-                <i class="fa-solid fa-arrow-right-long"></i>
-				X :<input id="joy1X" type="text" /></br>
-				Y :<input id="joy1Y" type="text" />
-			</div>
+            <div class="joystick-container">
+                <div class="joystick-body-container">
+                    <div id="joy1Div" style="width:70%;height:200px;margin: auto;"></div>
+                </div>
+				<div class="joystick-controlsinfo-container right-controls">
+                    <div><i class="fa-solid fa-arrow-up-long"></i></div>
+                    <div><span id="joy1Y">0</span></div>
+                    <div><i class="fa-solid fa-arrow-down-long"></i></div>
+                </div>
+                <div class="joystick-controlsinfo-container bottom-controls">
+                    <div><i class="fa-solid fa-arrow-left-long"></i></div>
+                    <div><span id="joy1X">0</span></div>
+                    <div><i class="fa-solid fa-arrow-right-long"></i></div>
+                </div>
+				<input id="joy1PosizioneX" type="hidden" />
+				<input id="joy1PosizioneY" type="hidden" />
+				<input id="joy1Direzione" type="hidden" />
+            </div>
+
 		</div>
 		<div class="grid-item sensor-data-grid">
             <div class="sensor-data-block">
@@ -246,8 +281,8 @@ var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
     joy1IinputPosX.value = stickData.xPosition;
     joy1InputPosY.value = stickData.yPosition;
     joy1Direzione.value = stickData.cardinalDirection;
-    joy1X.value = stickData.x;
-    joy1Y.value = stickData.y;
+    joy1X.innerText = stickData.x;
+    joy1Y.innerText = stickData.y;
 });
 
 		</script>
