@@ -291,13 +291,15 @@ var joy1InputPosY = document.getElementById("joy1PosizioneY");
 var joy1Direzione = document.getElementById("joy1Direzione");
 var joy1X = document.getElementById("joy1X");
 var joy1Y = document.getElementById("joy1Y");
-
+var stickDataGlobal;
 var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
     joy1IinputPosX.value = stickData.xPosition;
     joy1InputPosY.value = stickData.yPosition;
     joy1Direzione.value = stickData.cardinalDirection;
     joy1X.innerText = stickData.x;
     joy1Y.innerText = stickData.y;
+	stickDataGlobal.x = stickData.x;
+    stickDataGlobal.y = stickData.y;
 });
 
 
@@ -309,8 +311,8 @@ var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
       // Continuously send JSON objects to the server
       setInterval(() => {
         const data = {
-          x: stickData.x,
-          y: stickData.y,
+          x: stickDataGlobal.x,
+          y: stickDataGlobal.y,
           // Add more key-value pairs as needed
         };
 
