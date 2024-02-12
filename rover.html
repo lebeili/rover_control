@@ -300,7 +300,36 @@ var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
     joy1Y.innerText = stickData.y;
 });
 
-		</script>
 
+    const socket = new WebSocket('ws://109.204.233.11:3000'); // Replace with your server URL
+
+    socket.addEventListener('open', (event) => {
+      console.log('Connected to the server');
+      
+      // Continuously send JSON objects to the server
+      setInterval(() => {
+        const data = {
+          x: stickData.x,
+          y: stickData.y,
+          // Add more key-value pairs as needed
+        };
+
+        socket.send(JSON.stringify(data));
+      }, 1000); // Send every 1000 milliseconds (1 second)
+
+    });
+
+    socket.addEventListener('message', (event) => {
+      console.log('Message from server:', event.data);
+    });
+
+    socket.addEventListener('close', (event) => {
+      console.log('Connection closed');
+    });
+
+    socket.addEventListener('error', (error) => {
+      console.error('WebSocket Error:', error);
+    });
+  </script>
 </body>
 </html>

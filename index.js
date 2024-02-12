@@ -65,3 +65,22 @@ app.post('/api/updateData', (req, res) => {
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
 });
+
+
+const WebSocket = require('ws');
+const server = new WebSocket.Server({ port: 3000 }); // Replace with your desired port
+
+server.on('connection', (socket) => {
+  console.log('Client connected');
+
+  socket.on('message', (message) => {
+    console.log('Received message from client:', message);
+    // Handle the received JSON object as needed
+  });
+
+  socket.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
+
+console.log('WebSocket server is running on port 3000');
