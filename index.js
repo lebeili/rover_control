@@ -74,7 +74,9 @@ server.on('connection', (socket) => {
   console.log('Client connected');
 
   socket.on('message', (message) => {
-    console.log('Received message from client:', message);
+	     let jsonString = message.toString('utf8');
+    let jsonData = JSON.parse(jsonString);
+    console.log('Received message from client:', jsonData);
     // Handle the received JSON object as needed
   });
 
