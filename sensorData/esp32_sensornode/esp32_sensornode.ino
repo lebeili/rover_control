@@ -1,12 +1,13 @@
-#include <ESP8266WiFi.h>
-#include <ESP8266HTTPClient.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiMulti.h>
 #define SERVER_IP "109.204.233.11:80"
 #ifndef STASSID
-#define STASSID "Koti_50EC"
-#define STAPSK "CHKN7FE74YAYJ"
+#define STASSID "aalto open"
+#define STAPSK ""
 #endif
 
-
+WiFiMulti wifiMulti;
 
 
 
@@ -32,21 +33,20 @@ static const int RXPin = 13, TXPin = 15;
 static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
 SoftwareSerial ss(RXPin, TXPin);
-
 void setup() {
   Serial.begin(9600);
 
 
 
+pinMode(34, INPUT);
 
 
 
 
+  wifiMulti.addAP(STASSID, STAPSK);
 
-  WiFi.begin(STASSID, STAPSK);
-
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+  while((wifiMulti.run() != WL_CONNECTED)) {
+    delay(50);
     Serial.print(".");
   }
   Serial.println("");
@@ -62,8 +62,8 @@ void setup() {
 
   Serial.println(F("BMP280 Forced Mode Test."));
 
-  //if (!bmp.begin(BMP280_ADDRESS_ALT, BMP280_CHIPID)) {
-  if (!bmp.begin()) {
+  if (!bmp.begin(0x76)) {
+  //if (!bmp.begin()) {
     Serial.println(F("Could not find a valid BMP280 sensor, check wiring or "
                       "try a different address!"));
     while (1) delay(10);
@@ -97,24 +97,30 @@ void setup() {
 
 
 
-  	ss.begin(GPSBaud);
+    ss.begin(GPSBaud);
 
 }
 
 void loop() {
- if ((WiFi.status() == WL_CONNECTED)) {
+   //  /* Get a new normalized sensor event */
+  sensors_event_t accel;
+  sensors_event_t gyro;
+  sensors_event_t temp;
+  mpu_temp->getEvent(&temp);
+  mpu_accel->getEvent(&accel);
+  mpu_gyro->getEvent(&gyro);
+ if ((wifiMulti.run() == WL_CONNECTED)) {
 
-    WiFiClient client;
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
     // configure traged server and url
-    http.begin(client, "http://" SERVER_IP "/api/updateData");  // HTTP
+    http.begin("http://" SERVER_IP "/api/updateData");  // HTTP
     http.addHeader("Content-Type", "application/json");
 
     Serial.print("[HTTP] POST...\n");
     // start connection and send HTTP header and body
-    int httpCode = http.POST("{\"temperature\":\""+String(bmp.readTemperature())+"\",\"pressure\":\""+String(bmp.readPressure())+"\",\"location\":\""+String(gps.location.lat(),6)+","+String(gps.location.lng(),6)+"\"}");
+    int httpCode = http.POST("{\"temperature\":\""+String(bmp.readTemperature())+"\",\"speed\":\""+accel.acceleration.x+"\",\"brightness\":\""+String(analogRead(34))+"\",\"pressure\":\""+String(bmp.readPressure())+"\",\"location\":\""+String(gps.location.lat(),6)+","+String(gps.location.lng(),6)+"\"}");
 
     // httpCode will be negative on error
     if (httpCode > 0) {
@@ -157,13 +163,7 @@ void loop() {
   } else {
     Serial.println("Forced measurement failed!");
   }
- //  /* Get a new normalized sensor event */
-  sensors_event_t accel;
-  sensors_event_t gyro;
-  sensors_event_t temp;
-  mpu_temp->getEvent(&temp);
-  mpu_accel->getEvent(&accel);
-  mpu_gyro->getEvent(&gyro);
+
 
  Serial.print("Temperature ");
   Serial.print(temp.temperature);
@@ -194,108 +194,108 @@ Serial.print("Accel X: ");
 
 static const double LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
 Serial.print("Satellite value:");
-	printInt(gps.satellites.value(), gps.satellites.isValid(), 5);
+  printInt(gps.satellites.value(), gps.satellites.isValid(), 5);
   Serial.print("\nHDOP:");
-	printFloat(gps.hdop.hdop(), gps.hdop.isValid(), 6, 1);
+  printFloat(gps.hdop.hdop(), gps.hdop.isValid(), 6, 1);
   Serial.print("\nLatitude:");
-	printFloat(gps.location.lat(), gps.location.isValid(), 11, 6);
+  printFloat(gps.location.lat(), gps.location.isValid(), 11, 6);
   Serial.print("\nLongitude:");
-	printFloat(gps.location.lng(), gps.location.isValid(), 12, 6);
+  printFloat(gps.location.lng(), gps.location.isValid(), 12, 6);
   Serial.print("\nAge:");
-	printInt(gps.location.age(), gps.location.isValid(), 5);
+  printInt(gps.location.age(), gps.location.isValid(), 5);
   Serial.print("\nDate and time:");
-	printDateTime(gps.date, gps.time);
+  printDateTime(gps.date, gps.time);
   Serial.print("\nAltitude:");
-	printFloat(gps.altitude.meters(), gps.altitude.isValid(), 7, 2);
+  printFloat(gps.altitude.meters(), gps.altitude.isValid(), 7, 2);
   Serial.print("\nCourse:");
-	printFloat(gps.course.deg(), gps.course.isValid(), 7, 2);
+  printFloat(gps.course.deg(), gps.course.isValid(), 7, 2);
   Serial.print("\nSpeed:");
-	printFloat(gps.speed.kmph(), gps.speed.isValid(), 6, 2);
+  printFloat(gps.speed.kmph(), gps.speed.isValid(), 6, 2);
 Serial.print("\nCardinal:");  
-	printStr(gps.course.isValid() ? TinyGPSPlus::cardinal(gps.course.deg()) : "*** ", 6);
+  printStr(gps.course.isValid() ? TinyGPSPlus::cardinal(gps.course.deg()) : "*** ", 6);
 
-	
-	Serial.println();
+  
+  Serial.println();
 Serial.println("--------------------------------------");  
-	smartDelay(500);
+  smartDelay(500);
 
 
-	if (millis() > 5000 && gps.charsProcessed() < 10) {
-		Serial.println(F("No GPS data received: check wiring"));
-	}
+  if (millis() > 5000 && gps.charsProcessed() < 10) {
+    Serial.println(F("No GPS data received: check wiring"));
+  }
 }
 
 
 // This custom version of delay() ensures that the gps object
 // is being "fed".
 static void smartDelay(unsigned long ms) {
-	unsigned long start = millis();
-	do {
-		while (ss.available()) {
-			gps.encode(ss.read());
-		}
-	} while (millis() - start < ms);
+  unsigned long start = millis();
+  do {
+    while (ss.available()) {
+      gps.encode(ss.read());
+    }
+  } while (millis() - start < ms);
 }
 
 static void printFloat(float val, bool valid, int len, int prec) {
-	if (!valid) {
-		while (len-- > 1) {
-			Serial.print('*');
-		}
-		Serial.print(' ');
-	} else {
-		Serial.print(val, prec);
-		int vi = abs((int)val);
-		int flen = prec + (val < 0.0 ? 2 : 1); // . and -
-		flen += vi >= 1000 ? 4 : vi >= 100 ? 3 : vi >= 10 ? 2 : 1;
-		for (int i=flen; i<len; ++i) {
-			Serial.print(' ');
-		}
-	}
-	smartDelay(0);
+  if (!valid) {
+    while (len-- > 1) {
+      Serial.print('*');
+    }
+    Serial.print(' ');
+  } else {
+    Serial.print(val, prec);
+    int vi = abs((int)val);
+    int flen = prec + (val < 0.0 ? 2 : 1); // . and -
+    flen += vi >= 1000 ? 4 : vi >= 100 ? 3 : vi >= 10 ? 2 : 1;
+    for (int i=flen; i<len; ++i) {
+      Serial.print(' ');
+    }
+  }
+  smartDelay(0);
 }
 
 static void printInt(unsigned long val, bool valid, int len) {
-	char sz[32] = "*****************";
-	if (valid) {
-		sprintf(sz, "%ld", val);
-	}
-	sz[len] = 0;
-	for (int i=strlen(sz); i<len; ++i) {
-		sz[i] = ' ';
-	}
-	if (len > 0) {
-		sz[len-1] = ' ';
-	}
-	Serial.print(sz);
-	smartDelay(0);
+  char sz[32] = "*****************";
+  if (valid) {
+    sprintf(sz, "%ld", val);
+  }
+  sz[len] = 0;
+  for (int i=strlen(sz); i<len; ++i) {
+    sz[i] = ' ';
+  }
+  if (len > 0) {
+    sz[len-1] = ' ';
+  }
+  Serial.print(sz);
+  smartDelay(0);
 }
 
 static void printDateTime(TinyGPSDate &d, TinyGPSTime &t) {
-	if (!d.isValid()) {
-		Serial.print(F("********** "));
-	} else {
-		char sz[32];
-		sprintf(sz, "%02d/%02d/%02d ", d.month(), d.day(), d.year());
-		Serial.print(sz);
-	}
+  if (!d.isValid()) {
+    Serial.print(F("********** "));
+  } else {
+    char sz[32];
+    sprintf(sz, "%02d/%02d/%02d ", d.month(), d.day(), d.year());
+    Serial.print(sz);
+  }
 
-	if (!t.isValid()) {
-		Serial.print(F("******** "));
-	} else {
-		char sz[32];
-		sprintf(sz, "%02d:%02d:%02d ", t.hour(), t.minute(), t.second());
-		Serial.print(sz);
-	}
+  if (!t.isValid()) {
+    Serial.print(F("******** "));
+  } else {
+    char sz[32];
+    sprintf(sz, "%02d:%02d:%02d ", t.hour(), t.minute(), t.second());
+    Serial.print(sz);
+  }
 
-	printInt(d.age(), d.isValid(), 5);
-	smartDelay(0);
+  printInt(d.age(), d.isValid(), 5);
+  smartDelay(0);
 }
 
 static void printStr(const char *str, int len) {
-	int slen = strlen(str);
-	for (int i=0; i<len; ++i) {
-		Serial.print(i<slen ? str[i] : ' ');
-	}
-	smartDelay(0);
+  int slen = strlen(str);
+  for (int i=0; i<len; ++i) {
+    Serial.print(i<slen ? str[i] : ' ');
+  }
+  smartDelay(0);
 }
