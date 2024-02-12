@@ -315,15 +315,15 @@ static void printStr(const char *str, int len) {
 
 void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
   const uint8_t* src = (const uint8_t*) mem;
-  USE_SERIAL.printf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+//  sprintf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
   for(uint32_t i = 0; i < len; i++) {
     if(i % cols == 0) {
-      USE_SERIAL.printf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
+//      sprintf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
     }
-    USE_SERIAL.printf("%02X ", *src);
+ //   sprintf("%02X ", *src);
     src++;
   }
-  USE_SERIAL.printf("\n");
+  Serial.print("\n");
 }
 
 
@@ -332,22 +332,22 @@ void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
 
   switch(type) {
     case WStype_DISCONNECTED:
-      USE_SERIAL.printf("[WSc] Disconnected!\n");
+      Serial.print("[WSc] Disconnected!\n");
       break;
     case WStype_CONNECTED:
-      USE_SERIAL.printf("[WSc] Connected to url: %s\n", payload);
+     Serial.print("[WSc] Connected to url: %s\n");
 
       // send message to server when Connected
       webSocket.sendTXT("Connected");
       break;
     case WStype_TEXT:
-      USE_SERIAL.printf("[WSc] get text: %s\n", payload);
+      Serial.print("[WSc] get text: %s\n");
 
       // send message to server
       // webSocket.sendTXT("message here");
       break;
     case WStype_BIN:
-      USE_SERIAL.printf("[WSc] get binary length: %u\n", length);
+      //sprintf("[WSc] get binary length: %u\n", length);
       hexdump(payload, length);
 
       // send data to server
