@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JPEG Viewer</title>
+</head>
+<body>
+    <h1>JPEG Viewer</h1>
+    <img id="jpeg-image2" src="http://109.204.233.11:3000/frames/latest.jpg" alt="JPEG Image">
+   
+   <script>
+        function updateImage() {         
+const randomQuery = `?${Math.random()}`;
+            // Update the image source with the same filename but a different query parameter
+            document.getElementById('jpeg-image2').src = `/frames/latest.jpg${randomQuery}`;
+        }
+
+        // Update the image every 1000 ms (adjust as needed)
+        setInterval(updateImage, 100);
+    </script>
+</body>
+</html>
+

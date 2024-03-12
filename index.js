@@ -67,10 +67,10 @@ app.listen(port, () => {
 });
 
 
-const WebSocket = require('ws');
-const server = new WebSocket.Server({ port: 3000 }); // Replace with your desired port
+//const WebSocket = require('ws');
+//const server = new WebSocket.Server({ port: 3000 }); // Replace with your desired port
 
-server.on('connection', (socket) => {
+/*server.on('connection', (socket) => {
   console.log('Client connected');
 
   socket.on('message', (message) => {
@@ -83,6 +83,6 @@ server.on('connection', (socket) => {
   socket.on('close', () => {
     console.log('Client disconnected');
   });
-});
+});*/
 
 console.log('WebSocket server is running on port 3000');
