@@ -109,8 +109,8 @@
   <div class="grid-container">
     <div class="left-grid-subcontainer">
 		<div class="grid-item">
-			<iframe width="100%" height="300" src="https://www.youtube.com/embed/1ZmYX5nVwLc?si=Xq6evGoaQga1UwYk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-		</div>
+    <img id="jpeg-image2" src="frames/latest.jpg" alt="JPEG Image">
+   		</div>
 		<div class="grid-item" id="map-container">
 
         </div>
@@ -209,7 +209,16 @@
       document.getElementById('location_value').innerText = `${data.location}`;
     };
   </script>
+   <script>
+        function updateImage() {         
+const randomQuery = `?${Math.random()}`;
+            // Update the image source with the same filename but a different query parameter
+            document.getElementById('jpeg-image2').src = `/frames/latest.jpg${randomQuery}`;
+        }
 
+        // Update the image every 1000 ms (adjust as needed)
+        setInterval(updateImage, 100);
+    </script>
   <script>
 	mapboxgl.accessToken = 'pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w';
     const map = new mapboxgl.Map({
