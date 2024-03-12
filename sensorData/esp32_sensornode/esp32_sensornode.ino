@@ -6,9 +6,9 @@
 #define STASSID "aalto open"
 #define STAPSK ""
 #endif
-
+#include <WebSocketsClient.h>
 WiFiMulti wifiMulti;
-
+WebSocketsClient webSocket;
 
 
 
@@ -54,6 +54,17 @@ pinMode(34, INPUT);
   Serial.println(WiFi.localIP());
 
 
+
+  // server address, port and URL
+  webSocket.begin("109.204.233.11", 3000, "/");
+
+  // event handler
+  webSocket.onEvent(webSocketEvent);
+
+
+
+  // try ever 5000 again if connection has failed
+  webSocket.setReconnectInterval(5000);
 
 
 
@@ -140,7 +151,7 @@ void loop() {
 
     http.end();
   }
-
+webSocket.loop();
 
   // must call this to wake sensor up and get new measurement data
   // it blocks until measurement is complete
@@ -298,4 +309,56 @@ static void printStr(const char *str, int len) {
     Serial.print(i<slen ? str[i] : ' ');
   }
   smartDelay(0);
+}
+
+
+
+void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
+  const uint8_t* src = (const uint8_t*) mem;
+//  sprintf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
+  for(uint32_t i = 0; i < len; i++) {
+    if(i % cols == 0) {
+//      sprintf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
+    }
+ //   sprintf("%02X ", *src);
+    src++;
+  }
+  Serial.print("\n");
+}
+
+
+
+void webSocketEvent(WStype_t type, uint8_t * payload, size_t length) {
+
+  switch(type) {
+    case WStype_DISCONNECTED:
+      Serial.print("[WSc] Disconnected!\n");
+      break;
+    case WStype_CONNECTED:
+     Serial.print("[WSc] Connected to url: %s\n");
+
+      // send message to server when Connected
+      webSocket.sendTXT("Connected");
+      break;
+    case WStype_TEXT:
+      Serial.print("[WSc] get text: %s\n");
+
+      // send message to server
+      // webSocket.sendTXT("message here");
+      break;
+    case WStype_BIN:
+      //sprintf("[WSc] get binary length: %u\n", length);
+      hexdump(payload, length);
+
+      // send data to server
+      // webSocket.sendBIN(payload, length);
+      break;
+    case WStype_ERROR:      
+    case WStype_FRAGMENT_TEXT_START:
+    case WStype_FRAGMENT_BIN_START:
+    case WStype_FRAGMENT:
+    case WStype_FRAGMENT_FIN:
+      break;
+  }
+
 }
