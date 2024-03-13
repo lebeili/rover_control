@@ -69,8 +69,9 @@ app.post('/api/updateData', (req, res) => {
 
 // API endpoint to receive data from the client
 app.post('/api/updateControls', (req, res) => {
-  const newData = req.body;
-
+	const newData = req.body;
+	x=newData.x;
+	y=newData.y;
     console.log("x:"+newData.x+",y:"+newData.y);
   
   // Emit an event to update connected clients
@@ -78,7 +79,10 @@ app.post('/api/updateControls', (req, res) => {
 
   res.json({ success: true });
 });
-
+app.get('/api/getControls', (req, res) => {
+    console.log("responded with controls data");
+  res.json({ x:x,y:y,camAngle:camAngle  });
+});
 // Use body-parser middleware to parse request bodies
 app.use(bodyParser.json({ limit: '10mb' }));
 
