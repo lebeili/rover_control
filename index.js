@@ -69,7 +69,7 @@ app.post('/api/updateData', (req, res) => {
 
 // API endpoint to receive data from the client
 app.post('/api/updateControls', (req, res) => {
-  const newData = req.body;
+  const newData = JSON.parse(req.body);
     console.log("x:"+newData.x+",y:"+newData.y);
   
   // Emit an event to update connected clients
