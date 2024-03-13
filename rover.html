@@ -312,6 +312,10 @@ var Joy1 = new JoyStick('joy1Div', {}, function(stickData) {
     joy1Y.innerText = stickData.y;
 	stickDataGlobal.x = stickData.x;
     stickDataGlobal.y = stickData.y;
+	fetch("/api/updateControls", {
+  method: 'POST', // Specify the HTTP method
+  body: {x:stickDataGlobal.x,y:stickDataGlobal.y}
+});
 });
 
 

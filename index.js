@@ -7,6 +7,10 @@ const fs = require('fs');
 const app = express();
 const port = 80;
 const users = { 'blabla': '228228' };
+let x = 0;
+let y = 0;
+let camAngle = 0;
+
 // Create an EventEmitter to handle SSE connections
 const eventEmitter = new EventEmitter();
 
@@ -58,6 +62,18 @@ app.post('/api/updateData', (req, res) => {
   
   // Emit an event to update connected clients
   eventEmitter.emit('update', newData);
+
+  res.json({ success: true });
+});
+
+
+// API endpoint to receive data from the client
+app.post('/api/updateControls', (req, res) => {
+    console.log("control panel connection tried");
+  const newData = req.body;
+  
+  // Emit an event to update connected clients
+  //eventEmitter.emit('update', newData);
 
   res.json({ success: true });
 });
