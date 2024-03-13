@@ -70,7 +70,6 @@ app.post('/api/updateData', (req, res) => {
 // API endpoint to receive data from the client
 app.post('/api/updateControls', (req, res) => {
   const newData = req.body;
-      console.log(req);
 
     console.log("x:"+newData.x+",y:"+newData.y);
   
