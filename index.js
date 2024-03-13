@@ -69,8 +69,8 @@ app.post('/api/updateData', (req, res) => {
 
 // API endpoint to receive data from the client
 app.post('/api/updateControls', (req, res) => {
-    console.log("control panel connection tried");
   const newData = req.body;
+    console.log("x:"+newData.x+",y:"+newData.y);
   
   // Emit an event to update connected clients
   //eventEmitter.emit('update', newData);
