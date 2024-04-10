@@ -53,7 +53,7 @@
 
       fetch(`${serverUrl}/setDirection/${dir}`, {
         method: "POST",
-      });
+      }).then((res) => console.log(res));
     }
   </script>
   <body>

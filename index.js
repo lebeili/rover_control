@@ -113,15 +113,17 @@ app.post("/upload", (req, res) => {
   //res.status(200).send('Frame received successfully!');
 });
 
-app.post("/setDirection/:dir", (req) => {
+app.post("/setDirection/:dir", (req, res) => {
   const direction = req.params.dir;
   wss.clients.forEach((client) => {
     client.send(direction, (err) => {
       if (err) {
+        res.status(500).send(err);
         console.error(err);
       }
     });
   });
+  res.status(200).send(`set direction ${direction}`);
 });
 
 app.listen(port, () => {
