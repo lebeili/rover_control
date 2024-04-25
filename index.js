@@ -78,7 +78,7 @@ app.post('/api/updateControls', (req, res) => {
 
 
 app.get('/api/getControls', (req, res) => {
-    console.log("responded with controls data");
+   // console.log("responded with controls data");
   res.json({ x:x,y:y,camAngle:camAngle  });
 });
 
@@ -106,7 +106,7 @@ app.post('/upload', (req, res) => {
     fs.writeFileSync(path.join(__dirname, 'frames', fileName), imageBuffer);
 
     // Respond with success message
-    res.status(200).send('Frame received successfully!');
+    //res.status(200).send('Frame received successfully!');
 });
 
 app.listen(port, () => {
