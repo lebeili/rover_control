@@ -73,16 +73,16 @@ app.post('/api/updateControls', (req, res) => {
 	x=newData.x;
 	y=newData.y;
     console.log("x:"+newData.x+",y:"+newData.y);
-  
-  // Emit an event to update connected clients
-  //eventEmitter.emit('update', newData);
-
-  res.json({ success: true });
+	res.json({ success: true });
 });
+
+
 app.get('/api/getControls', (req, res) => {
     console.log("responded with controls data");
   res.json({ x:x,y:y,camAngle:camAngle  });
 });
+
+
 // Use body-parser middleware to parse request bodies
 app.use(bodyParser.json({ limit: '10mb' }));
 
