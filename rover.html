@@ -226,7 +226,7 @@
     <script>
       // EventSource to listen for server-sent events
       const eventSource = new EventSource("/events");
-      var gps_location;
+      var gps_location=[40,40];
       // Update data on receiving server-sent events
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -240,8 +240,7 @@
         document.getElementById("speed_value").innerText = `${data.speed}`;
         document.getElementById("location_value").innerText =
           `${data.location}`;
-        gps_location[0] = 40;
-        gps_location[1] = 40;
+
         gps_location = data.location.split(",");
         gps_location[0] = parseInt(gps_location[0]);
         gps_location[1] = parseInt(gps_location[1]);
