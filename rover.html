@@ -240,10 +240,11 @@
         document.getElementById("speed_value").innerText = `${data.speed}`;
         document.getElementById("location_value").innerText =
           `${data.location}`;
+        gps_location[0] = 40;
+        gps_location[1] = 40;
         gps_location = data.location.split(",");
         gps_location[0] = parseInt(gps_location[0]);
         gps_location[1] = parseInt(gps_location[1]);
-        gps_location[0] = 40;
       };
 
       function updateImage() {
