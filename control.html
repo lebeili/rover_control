@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rover control</title>
+  </head>
+  <style>
+    .button-grid {
+      margin: 2rem 0 0 2rem;
+      width: 30rem;
+      display: grid;
+      grid-template: auto auto auto / auto auto auto;
+      grid-gap: 0.5rem;
+    }
+    button {
+      all: unset;
+      width: 6rem;
+      padding: 1rem;
+      font-family: monospace;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      background-color: #f0f0f0;
+      transition: all ease-in-out 150ms;
+    }
+
+    button.selected {
+      color: #f0f0f0;
+      background-color: #146ac7;
+    }
+  </style>
+  <script>
+    const serverUrl = (() => {
+      const splits = window.location.href.split("/");
+      splits.pop();
+      return splits.join("/");
+    })();
+
+    console.log(serverUrl);
+
+    function setSelectedDirection(dir) {
+      const prevSelected = document.getElementsByClassName("selected");
+      let i = 0;
+      while (i < prevSelected.length) {
+        prevSelected.item(i).classList.remove("selected");
+        i += 1;
+      }
+
+      const button = document.getElementById(dir);
+      button.classList.add("selected");
+
+      fetch(`${serverUrl}/setDirection/${dir}`, {
+        method: "POST",
+      }).then((res) => console.log(res));
+    }
+  </script>
+  <body>
+    <div class="button-grid">
+      <div></div>
+      <button id="fwd" onclick="setSelectedDirection('fwd')">FORWARD</button>
+      <div></div>
+      <button id="left" onclick="setSelectedDirection('left')">LEFT</button>
+      <button id="stby" onclick="setSelectedDirection('stby')">STANDBY</button>
+      <button id="right" onclick="setSelectedDirection('right')">RIGHT</button>
+      <div></div>
+      <button id="back" onclick="setSelectedDirection('back')">BACK</button>
+      <div></div>
+    </div>
+  </body>
+</html>
