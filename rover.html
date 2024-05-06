@@ -274,18 +274,23 @@
           type: "geojson",
           data: geojson,
         });
+        map.loadImage(
+            'https://docs.mapbox.com/mapbox-gl-js/assets/cat.png',
+            (error, image) => {
+                if (error) throw error;
+
+                // Add the image to the map style.
+                map.addImage('rover', image);
+
+            });
         // Add the rocket symbol layer to the map.
         map.addLayer({
           id: "iss",
           type: "symbol",
-          source: "iss",
+          source: "rover",
           layout: {
-            // This icon is a part of the Mapbox Streets style.
-            // To view all images available in a Mapbox style, open
-            // the style in Mapbox Studio and click the "Images" tab.
-            // To add a new image to the style at runtime see
-            // https://docs.mapbox.com/mapbox-gl-js/example/add-image/
-            "icon-image": "rocket",
+            'icon-image': 'rover', // reference the image
+            'icon-size': 0.25
           },
         });
 
