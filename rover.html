@@ -290,7 +290,7 @@
           source: "iss",
           layout: {
             'icon-image': 'rover', // reference the image
-            'icon-size': 0.25
+            'icon-size': 0.4
           },
         });
 
@@ -312,7 +312,7 @@
             map.flyTo({
               center: [gps_location[1], gps_location[0]],
               speed: 0.5,
-              zoom: 7,
+              zoom: 14,
             });
             // Return the location of the ISS as GeoJSON.
             return {
