@@ -10,7 +10,7 @@ const wss = new ws.WebSocketServer({ port: 3000 });
 const app = express();
 const port = 8080;
 const users = { blabla: "228228" };
-
+app.use(express.static('public'));
 let x = 0;
 let y = 0;
 let camAngle = 0;
