@@ -70,11 +70,11 @@ void handleDirectionChange(char *dir) {
   if (strcmp(dir, "fwd") == 0) {
     lerpChangeMotors(MAX_SPEED, MAX_SPEED);
   } else if (strcmp(dir, "right") == 0) {
-    lerpChangeMotors(TURN_SPEED, -TURN_SPEED);
+    lerpChangeMotors(-TURN_SPEED, TURN_SPEED);
   } else if (strcmp(dir, "back") == 0) {
     lerpChangeMotors(-MAX_SPEED, -MAX_SPEED);
   } else if (strcmp(dir, "left") == 0) {
-    lerpChangeMotors(-TURN_SPEED, TURN_SPEED);
+    lerpChangeMotors(TURN_SPEED, -TURN_SPEED);
   } else if (strcmp(dir, "stby") == 0) {
     lerpChangeMotors(0, 0);
     motorA.standby();
@@ -126,8 +126,6 @@ void setup() {
   // Connect to wifi
   digitalWrite(INDICATOR, HIGH);
 
-  motorA.drive(50);
-  motorB.drive(50);
   WiFi.begin(ssid, password);
   delay(1000);
   digitalWrite(INDICATOR, LOW);
