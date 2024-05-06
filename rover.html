@@ -305,7 +305,7 @@
             const { latitude, longitude } = await response.json();
             // Fly the map to the location.
             map.flyTo({
-              center: [gps_location[0], gps_location[1]],
+              center: [gps_location[1], gps_location[0]],
               speed: 0.5,
               zoom: 7,
             });
@@ -317,7 +317,7 @@
                   type: "Feature",
                   geometry: {
                     type: "Point",
-                    coordinates: [gps_location[0], gps_location[1]],
+                    coordinates: [gps_location[1], gps_location[0]],
                   },
                 },
               ],
