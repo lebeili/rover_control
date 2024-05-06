@@ -241,6 +241,8 @@
         document.getElementById("location_value").innerText =
           `${data.location}`;
         gps_location = data.location.split(",");
+        gps_location[0] = parseFloat(gps_location[0]);
+        gps_location[1] = parseFloat(gps_location[1]);
       };
 
       function updateImage() {
@@ -302,7 +304,7 @@
             const { latitude, longitude } = await response.json();
             // Fly the map to the location.
             map.flyTo({
-              center: [longitude, latitude],
+              center: [gps_location[0], gps_location[1]],
               speed: 0.5,
               zoom: 7,
             });
