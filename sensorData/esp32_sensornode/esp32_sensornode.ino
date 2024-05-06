@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WiFiMulti.h>
-#define SERVER_IP "109.204.233.11:80"
+#define SERVER_IP "109.204.233.236:8080"
 #ifndef STASSID
 #define STASSID "aalto open"
 #define STAPSK ""
@@ -56,7 +56,7 @@ pinMode(34, INPUT);
 
 
   // server address, port and URL
-  webSocket.begin("109.204.233.11", 3000, "/");
+  webSocket.begin(SERVER_IP, 3000, "/");
 
   // event handler
   webSocket.onEvent(webSocketEvent);
