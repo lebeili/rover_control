@@ -4,6 +4,8 @@
 
 #include "secrets.h"
 
+#define INDICATOR 14
+
 #define STBY 2
 
 #define AIN1 16
@@ -18,7 +20,10 @@ const char *ssid = SECRET_SSID;
 const char *password = SECRET_PWD;
 const char *wsUrl = SECRET_URL;
 
-// At the moment, all motors are hooked up the "wrong" way
+const int MAX_SPEED = 50;
+const int TURN_SPEED = 100;
+// const int LOW_SPEED = 30;
+
 const int offsetA = -1;
 const int offsetB = -1;
 
@@ -63,13 +68,13 @@ void lerpChangeMotors(int targetA, int targetB) {
 
 void handleDirectionChange(char *dir) {
   if (strcmp(dir, "fwd") == 0) {
-    lerpChangeMotors(150, 150);
+    lerpChangeMotors(MAX_SPEED, MAX_SPEED);
   } else if (strcmp(dir, "right") == 0) {
-    lerpChangeMotors(150, 50);
+    lerpChangeMotors(TURN_SPEED, -TURN_SPEED);
   } else if (strcmp(dir, "back") == 0) {
-    lerpChangeMotors(-150, -150);
+    lerpChangeMotors(-MAX_SPEED, -MAX_SPEED);
   } else if (strcmp(dir, "left") == 0) {
-    lerpChangeMotors(50, 150);
+    lerpChangeMotors(-TURN_SPEED, TURN_SPEED);
   } else if (strcmp(dir, "stby") == 0) {
     lerpChangeMotors(0, 0);
     motorA.standby();
@@ -78,9 +83,11 @@ void handleDirectionChange(char *dir) {
 }
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
+  digitalWrite(INDICATOR, HIGH);
   switch (type) {
   case WStype_DISCONNECTED:
     Serial.println("[WSc] Disconnected!\n");
+    Serial.println((char *)payload);
     break;
   case WStype_ERROR:
     Serial.println("[WSc] There was an oopsie!\n");
@@ -88,7 +95,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   case WStype_CONNECTED: {
     Serial.print("[WSc] Connected to url: ");
     Serial.println((char *)payload);
-    // send message to server when Connected
+    //  send message to server when Connected
     webSocket.sendTXT("Hello server, this is MECHA-POUTA speaking.");
   } break;
   case WStype_TEXT:
@@ -99,27 +106,40 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   case WStype_BIN:
     Serial.print("[WSc] get binary length: ");
     Serial.println(length);
-    // hexdump(payload, length);
+    //  hexdump(payload, length);
 
     // send data to server
     // webSocket.sendBIN(payload, length);
     break;
   }
+  delay(100);
+  digitalWrite(INDICATOR, LOW);
 }
 
 void setup() {
   motorA.standby();
   motorB.standby();
+  pinMode(INDICATOR, OUTPUT);
 
   Serial.begin(9600);
+
   // Connect to wifi
+  digitalWrite(INDICATOR, HIGH);
+
+  motorA.drive(50);
+  motorB.drive(50);
   WiFi.begin(ssid, password);
+  delay(1000);
+  digitalWrite(INDICATOR, LOW);
 
   // Wait some time to connect to wifi
   for (int i = 0; i < 10 && WiFi.status() != WL_CONNECTED; i++) {
+    digitalWrite(INDICATOR, HIGH);
+    delay(1000);
+    digitalWrite(INDICATOR, LOW);
     Serial.println("Connecting...");
     WiFi.begin(ssid, password);
-    delay(1000);
+    delay(100);
   }
 
   webSocket.begin(wsUrl, 3000);
