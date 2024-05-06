@@ -226,10 +226,11 @@
     <script>
       // EventSource to listen for server-sent events
       const eventSource = new EventSource("/events");
-
+      var gps_location;
       // Update data on receiving server-sent events
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        
         document.getElementById("temperature_value").innerText =
           `${data.temperature}`;
         document.getElementById("pressure_value").innerText =
@@ -239,9 +240,9 @@
         document.getElementById("speed_value").innerText = `${data.speed}`;
         document.getElementById("location_value").innerText =
           `${data.location}`;
+        gps_location = data.location;
       };
-    </script>
-    <script>
+
       function updateImage() {
         const randomQuery = `?${Math.random()}`;
         // Update the image source with the same filename but a different query parameter
@@ -251,8 +252,8 @@
 
       // Update the image every 1000 ms (adjust as needed)
       setInterval(updateImage, 100);
-    </script>
-    <script>
+
+      
       mapboxgl.accessToken =
         "pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w";
       const map = new mapboxgl.Map({
