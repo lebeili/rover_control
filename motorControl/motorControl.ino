@@ -24,8 +24,8 @@ const int MAX_SPEED = 50;
 const int TURN_SPEED = 100;
 // const int LOW_SPEED = 30;
 
-const int offsetA = -1;
-const int offsetB = -1;
+const int offsetA = 1;
+const int offsetB = 1;
 
 Motor motorA = Motor(AIN1, AIN2, PWMA, offsetA, STBY, 5000, 8, 1);
 Motor motorB = Motor(BIN1, BIN2, PWMB, offsetB, STBY, 5000, 8, 2);
