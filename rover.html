@@ -243,6 +243,7 @@
         gps_location = data.location.split(",");
         gps_location[0] = parseFloat(gps_location[0]);
         gps_location[1] = parseFloat(gps_location[1]);
+         gps_location[0] = 40;
       };
 
       function updateImage() {
@@ -316,7 +317,7 @@
                   type: "Feature",
                   geometry: {
                     type: "Point",
-                    coordinates: [longitude, latitude],
+                    coordinates: [gps_location[0], gps_location[1]],
                   },
                 },
               ],
