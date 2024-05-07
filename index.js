@@ -71,7 +71,7 @@ app.post("/api/updateData", (req, res) => {
   // Emit an event to update connected clients
   eventEmitter.emit("update", newData);
   res.set('Content-Type', 'text/html')
-  res.send(toString(camAngle));
+  res.send(camAngle.toString());
   //res.json({ success: true});
 });
 
