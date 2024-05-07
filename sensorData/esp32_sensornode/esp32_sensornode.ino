@@ -33,7 +33,26 @@ static const int RXPin = 13, TXPin = 15;
 static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
 SoftwareSerial ss(RXPin, TXPin);
+
+
+#include <ESP32Servo.h>
+Servo myservo;  // create servo object to control a servo
+
+
+
 void setup() {
+
+  // Allow allocation of all timers
+  ESP32PWM::allocateTimer(0);
+  ESP32PWM::allocateTimer(1);
+  ESP32PWM::allocateTimer(2);
+  ESP32PWM::allocateTimer(3);
+  myservo.setPeriodHertz(50);    // standard 50 hz servo
+  myservo.attach(26, 1000, 2000); // attaches the servo on pin 18 to the servo object
+  // using default min/max of 1000us and 2000us
+  // different servos may require different min/max settings
+  // for an accurate 0 to 180 sweep
+  
   Serial.begin(9600);
 
 
@@ -144,6 +163,7 @@ void loop() {
         Serial.println("received payload:\n<<");
         Serial.println(payload);
         Serial.println(">>");
+        myservo.write(payload.toInt());
       }
     } else {
       Serial.printf("[HTTP] POST... failed, error: %s\n", http.errorToString(httpCode).c_str());
