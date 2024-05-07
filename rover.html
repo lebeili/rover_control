@@ -197,7 +197,7 @@ input[type="range"]:focus::-moz-range-thumb {
     margin: 12px !important;
     margin-top: 11px;
 "></i>
-			<input type="range" class="slider" value="50" style="
+			<input type="range" class="slider" id="camera_angle" value="50" style="
     display: inline;
     /* margin-bottom: 11px; */
 ">
@@ -413,6 +413,21 @@ input[type="range"]:focus::-moz-range-thumb {
     </script>
 
     <script type="text/javascript">
+	
+	var angleSlider = document.getElementById("camera_angle");
+	angleSlider.addEventListener('input', function() {
+		fetch("/api/updateCamAngle", {
+          method: "POST", // Specify the HTTP method
+          body: JSON.stringify({
+            angle: angleSlider.value,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        });
+	}, false);
+	
+	
       var joy1IinputPosX = document.getElementById("joy1PosizioneX");
       var joy1InputPosY = document.getElementById("joy1PosizioneY");
       var joy1Direzione = document.getElementById("joy1Direzione");

@@ -83,6 +83,14 @@ app.post("/api/updateControls", (req, res) => {
   res.json({ success: true });
 });
 
+// API endpoint to receive data from the client
+app.post("/api/updateCamAngle", (req, res) => {
+  const newData = req.body;
+  camAngle = newData.angle;
+  console.log("camera angle:" + newData.angle);
+  res.json({ success: true });
+});
+
 app.get("/api/getControls", (req, res) => {
   // console.log("responded with controls data");
   res.json({ x: x, y: y, camAngle: camAngle });
