@@ -13,7 +13,7 @@ const users = { blabla: "228228" };
 app.use(express.static('public'));
 let x = 0;
 let y = 0;
-let camAngle = 0;
+let camAngle = 90;
 
 // Create an EventEmitter to handle SSE connections
 const eventEmitter = new EventEmitter();
@@ -70,8 +70,9 @@ app.post("/api/updateData", (req, res) => {
 
   // Emit an event to update connected clients
   eventEmitter.emit("update", newData);
-
-  res.json({ success: true });
+  res.set('Content-Type', 'text/plain')
+  res.send(camAngle);
+  //res.json({ success: true});
 });
 
 // API endpoint to receive data from the client
