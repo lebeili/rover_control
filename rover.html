@@ -70,12 +70,10 @@
         grid-template-rows: 1fr 1fr 1fr;
       }
 
-      .slider {
-        width: 80%;
-        max-width: 300px;
-        margin: 0 auto;
-      }
-
+		.slider-body-container {
+			width: 80%;
+			margin: 50px;
+		}
       #joy1Div {
         width: 100%;
       }
@@ -115,6 +113,71 @@
       #jpeg-image2 {
         max-width: 750px;
       }
+/********** Range Input Styles **********/
+/*Range Reset*/
+input[type="range"] {
+   -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    cursor: pointer;
+    width: 23rem;
+}
+
+/* Removes default focus */
+input[type="range"]:focus {
+  outline: none;
+}
+
+/***** Chrome, Safari, Opera and Edge Chromium styles *****/
+/* slider track */
+input[type="range"]::-webkit-slider-runnable-track {
+   background-color: #053a5f;
+   border-radius: 0.5rem;
+   height: 0.5rem;  
+}
+
+/* slider thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+   appearance: none;
+   margin-top: -12px; /* Centers thumb on the track */
+
+   /*custom styles*/
+   background-color: #5cd5eb;
+   height: 2rem;
+   width: 1rem;
+}
+
+input[type="range"]:focus::-webkit-slider-thumb {   
+  border: 1px solid #053a5f;
+  outline: 3px solid #053a5f;
+  outline-offset: 0.125rem; 
+}
+
+/******** Firefox styles ********/
+/* slider track */
+input[type="range"]::-moz-range-track {
+   background-color: #053a5f;
+   border-radius: 0.5rem;
+   height: 0.5rem;
+}
+
+/* slider thumb */
+input[type="range"]::-moz-range-thumb {
+   border: none; /*Removes extra border that FF applies*/
+   border-radius: 0; /*Removes default border-radius that FF applies*/
+
+   /*custom styles*/
+   background-color: #5cd5eb;
+   height: 2rem;
+   width: 1rem;
+}
+
+input[type="range"]:focus::-moz-range-thumb {
+  border: 1px solid #053a5f;
+  outline: 3px solid #053a5f;
+  outline-offset: 0.125rem; 
+}
     </style>
     <script src="joy.js"></script>
   </head>
@@ -126,8 +189,21 @@
         </div>
         <div class="grid-item" id="map-container"></div>
         <div class="grid-item">
-          <input type="range" class="slider" value="50" />
-          <div class="joystick-container">
+		 
+		 <div class="slider-body-container">
+		 <i class="fa-solid fa-video-camera" aria-hidden="true" style="
+    display: inline;
+    font-size: 22px;
+    margin: 12px !important;
+    margin-top: 11px;
+"></i>
+			<input type="range" class="slider" value="50" style="
+    display: inline;
+    /* margin-bottom: 11px; */
+">
+			</div>
+			<div class="joystick-container">
+		  
             <div class="joystick-body-container">
               <div
                 id="joy1Div"
@@ -205,7 +281,7 @@
               <span id="location_value" class="sensor-data-block-value"
                 >21</span
               >
-              <span class="sensor-data-block-unit">°C</span>
+              <span class="sensor-data-block-unit"></span>
             </div>
           </div>
         </div>
