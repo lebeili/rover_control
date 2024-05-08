@@ -66,7 +66,7 @@ void lerpChangeMotors(int targetA, int targetB) {
   motorB.drive(targetB);
 }
 
-void handleDirectionChange(char *dir) {
+void handleDirectionChange(int x, int y) {
   if (strcmp(dir, "fwd") == 0) {
     lerpChangeMotors(MAX_SPEED, MAX_SPEED);
   } else if (strcmp(dir, "right") == 0) {
