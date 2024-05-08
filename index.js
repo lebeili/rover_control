@@ -10,6 +10,7 @@ const wss = new ws.WebSocketServer({ port: 3000 });
 const app = express();
 const port = 8080;
 const users = { blabla: '228228' };
+
 app.use(express.static('public'));
 
 let x = 0;
@@ -30,7 +31,6 @@ const basicAuthMiddleware = basicAuth({
 
 // Use basicAuthMiddleware for the path you want to protect
 app.use('/rover', basicAuthMiddleware);
-app.use('/control', basicAuthMiddleware);
 app.use('/mobile', basicAuthMiddleware);
 
 // Serve static files (HTML, JS, CSS, etc.)
@@ -43,10 +43,6 @@ app.get('/rover', (req, res) => {
 
 app.get('/mobile', (req, res) => {
   res.sendFile(path.join(__dirname, '', 'mobile.html'));
-});
-
-app.get('/control', (req, res) => {
-  res.sendFile(path.join(__dirname, '', 'control.html'));
 });
 
 // SSE endpoint to send real-time updates
@@ -85,7 +81,19 @@ app.post('/api/updateControls', (req, res) => {
   x = newData.x;
   y = newData.y;
   console.log('x:' + newData.x + ',y:' + newData.y);
-  res.json({ success: true });
+  const buffer = new Int8Array(2);
+  buffer[0] = x;
+  buffer[1] = y;
+
+  wss.clients.forEach(client => {
+    client.send(buffer, err => {
+      if (err) {
+        res.status(500).send(err);
+        console.error(err);
+      }
+    });
+  });
+  res.json({ x, y });
 });
 
 // API endpoint to receive data from the client
@@ -98,7 +106,7 @@ app.post('/api/updateCamAngle', (req, res) => {
 
 app.get('/api/getControls', (req, res) => {
   // console.log("responded with controls data");
-  res.json({ x: x, y: y, camAngle: camAngle });
+  res.json({ x, y, camAngle });
 });
 
 // Use body-parser middleware to parse request bodies
