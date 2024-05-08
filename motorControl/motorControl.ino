@@ -20,8 +20,9 @@ const char *ssid = SECRET_SSID;
 const char *password = SECRET_PWD;
 const char *wsUrl = SECRET_URL;
 
-const int MAX_SPEED = 50;
-const int TURN_SPEED = 100;
+// const int MAX_SPEED = 100;
+const int MAX_SPEED = 100;
+// const int TURN_SPEED = 100;
 // const int LOW_SPEED = 30;
 
 const int offsetA = 1;
@@ -35,7 +36,7 @@ int speedB = 0;
 WebSocketsClient webSocket;
 
 // Do lerp for changing motor speeds to reduce back EMF
-void lerpChangeMotors(int targetA, int targetB) {
+void lerpChangeMotors(int targetB, int targetA) {
   Serial.print("LERPing to A: ");
   Serial.print(targetA);
   Serial.print(" B: ");
@@ -46,7 +47,6 @@ void lerpChangeMotors(int targetA, int targetB) {
 
   int stepA = (targetA - speedA) / n;
   int stepB = (targetB - speedB) / n;
-
   for (int i = 0; i < n; i++) {
     Serial.print("A: ");
     Serial.println(speedA + stepA);
@@ -66,19 +66,29 @@ void lerpChangeMotors(int targetA, int targetB) {
   motorB.drive(targetB);
 }
 
-void handleDirectionChange(char *dir) {
-  if (strcmp(dir, "fwd") == 0) {
-    lerpChangeMotors(MAX_SPEED, MAX_SPEED);
-  } else if (strcmp(dir, "right") == 0) {
-    lerpChangeMotors(-TURN_SPEED, TURN_SPEED);
-  } else if (strcmp(dir, "back") == 0) {
-    lerpChangeMotors(-MAX_SPEED, -MAX_SPEED);
-  } else if (strcmp(dir, "left") == 0) {
-    lerpChangeMotors(TURN_SPEED, -TURN_SPEED);
-  } else if (strcmp(dir, "stby") == 0) {
-    lerpChangeMotors(0, 0);
-    motorA.standby();
-    motorB.standby();
+void handleDirectionChange(signed char rawX, signed char rawY) {
+  int x = (int)(rawX | 0);
+  int y = (int)(rawY | 0);
+
+  // No turning required, y is just speed
+  if (x == 0) {
+    lerpChangeMotors(y, y);
+    if (y == 0) {
+      motorA.standby();
+      motorB.standby();
+    }
+    return;
+  }
+
+  int adjX = map(abs(x), 1, 100, y, -y);
+
+  // Turning left
+  if (x < 0) {
+    lerpChangeMotors(adjX, y);
+  }
+  // Turning right
+  else if (x > 0) {
+    lerpChangeMotors(y, adjX);
   }
 }
 
@@ -101,15 +111,11 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   case WStype_TEXT:
     Serial.print("[WSc] get text: ");
     Serial.println((char *)payload);
-    handleDirectionChange((char *)payload);
     break;
   case WStype_BIN:
     Serial.print("[WSc] get binary length: ");
     Serial.println(length);
-    //  hexdump(payload, length);
-
-    // send data to server
-    // webSocket.sendBIN(payload, length);
+    handleDirectionChange((signed char)payload[0], (signed char)payload[1]);
     break;
   }
   delay(100);
