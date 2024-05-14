@@ -12,7 +12,7 @@ const port = 8080;
 const users = { blabla: '228228' };
 
 app.use(express.static('public'));
-app.use(express.json({ limit: '200kb' }));
+//app.use(express.json({ limit: '200kb' }));
 
 let x = 0;
 let y = 0;
