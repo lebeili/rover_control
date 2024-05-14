@@ -390,13 +390,14 @@
               zoom: 17,
             });
             // Return the location of the ISS as GeoJSON.
+            
             return {
               type: 'FeatureCollection',
               features: [
                 {
                   type: 'Feature',
                   geometry: {
-                    type: 'Point',mobile
+                    type: 'Point',
                     coordinates: [gps_location[1], gps_location[0]],
                   },
                 },
