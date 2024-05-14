@@ -6,7 +6,7 @@ const { EventEmitter } = require('events');
 const fs = require('fs');
 const ws = require('ws');
 
-const wss = new ws.WebSocketServer({ port: 3000 });
+const wss = new ws.WebSocketServer({ port: 3001 });
 const app = express();
 const port = 8080;
 const users = { blabla: '228228' };
