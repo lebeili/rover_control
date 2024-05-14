@@ -12,7 +12,6 @@ const port = 8080;
 const users = { blabla: '228228' };
 
 app.use(express.static('public'));
-app.use(bodyParser.json({ limit: '5mb' })); 
 
 let x = 0;
 let y = 0;
@@ -111,7 +110,7 @@ app.get('/api/getControls', (req, res) => {
 });
 
 // Use body-parser middleware to parse request bodies
-app.use(bodyParser.json({ limit: '10mb' }));
+//app.use(bodyParser.json({ limit: '10mb' }));
 
 // Serve JPEG files based on the requested path
 app.get('/frames/:imageName', (req, res) => {
@@ -122,6 +121,7 @@ app.get('/frames/:imageName', (req, res) => {
   res.sendFile(imagePath);
 });
 // Handle frame upload
+//app.use(bodyParser.json({ limit: '5mb' })); 
 app.post('/upload', (req, res) => {
   // Decode base64 image and save it to a file
   const imageData = req.body.image;
@@ -132,7 +132,7 @@ app.post('/upload', (req, res) => {
   fs.writeFileSync(path.join(__dirname, 'frames', fileName), imageBuffer);
 
   // Respond with success message
-  //res.status(200).send('Frame received successfully!');
+  res.status(200).send('Frame received successfully!');
 });
 
 app.post('/setDirection/:dir', (req, res) => {
