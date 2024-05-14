@@ -110,7 +110,7 @@ app.get('/api/getControls', (req, res) => {
 });
 
 // Use body-parser middleware to parse request bodies
-app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.json({ limit: '100mb' }));
 
 // Serve JPEG files based on the requested path
 app.get('/frames/:imageName', (req, res) => {
