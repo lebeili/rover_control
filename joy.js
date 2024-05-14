@@ -325,7 +325,7 @@ var JoyStick = function (container, parameters, callback) {
     StickStatus.xPosition = movedX;
     StickStatus.yPosition = movedY;
     StickStatus.x = (100 * ((movedX - centerX) / maxMoveStick)).toFixed();
-    localStorage.setItem('x', stickData.x);
+    //localStorage.setItem('x', stickData.x);
     StickStatus.y = (100 * ((movedY - centerY) / maxMoveStick) * -1).toFixed();
     StickStatus.cardinalDirection = getCardinalDirection();
     callback(StickStatus);
