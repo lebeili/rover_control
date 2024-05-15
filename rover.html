@@ -167,7 +167,6 @@
         outline-offset: 0.125rem;
       }
     </style>
-
     <script src="joy.js"></script>
   </head>
   <body>
@@ -343,15 +342,12 @@
       map.on('load', async () => {
         // Get the initial location of the International Space Station (ISS).
         const geojson = await getLocation();
-        map.loadImage(
-          'http://109.204.233.236:8080/public/rover.png',
-          (error, image) => {
-            if (error) throw error;
+        map.loadImage('/public/rover.png', (error, image) => {
+          if (error) throw error;
 
-            // Add the image to the map style.
-            map.addImage('rover', image);
-          }
-        );
+          // Add the image to the map style.
+          map.addImage('rover', image);
+        });
         // Add the ISS location as a source.
         map.addSource('iss', {
           type: 'geojson',
@@ -390,7 +386,7 @@
               zoom: 17,
             });
             // Return the location of the ISS as GeoJSON.
-            
+
             return {
               type: 'FeatureCollection',
               features: [
@@ -412,36 +408,39 @@
       });
     </script>
 
-    <script type="text/javascript">
-      var angleSlider = document.getElementById('camera_angle');
+    <script>
+      let angleSlider = document.getElementById('camera_angle');
+      let camTimedOut = false;
       angleSlider.addEventListener(
         'input',
         function () {
-          fetch('/api/updateCamAngle', {
-            method: 'POST', // Specify the HTTP method
-            body: JSON.stringify({
-              angle: angleSlider.value,
-            }),
-            headers: {
-              'Content-type': 'application/json; charset=UTF-8',
-            },
-          });
+          if (!camTimedOut) {
+            fetch('/api/updateCamAngle', {
+              method: 'POST', // Specify the HTTP method
+              body: JSON.stringify({
+                angle: angleSlider.value,
+              }),
+              headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+              },
+            });
+            camTimedOut = true;
+            setTimeout(() => {
+              camTimedOut = false;
+            }, 100);
+          }
         },
         false
       );
-      const serverUrl = (() => {
-        const splits = window.location.href.split('/');
-        splits.pop();
-        return splits.join('/');
-      })();
-
+    </script>
+    <script>
       let joy1IinputPosX = document.getElementById('joy1PosizioneX');
       let joy1InputPosY = document.getElementById('joy1PosizioneY');
       let joy1Direzione = document.getElementById('joy1Direzione');
       let joy1X = document.getElementById('joy1X');
       let joy1Y = document.getElementById('joy1Y');
       let stickDataGlobal = { x: 0, y: 0 };
-      let timedOut = false;
+      let joyTimedOut = false;
       let Joy1 = new JoyStick(
         'joy1Div',
         { autoReturnToCenter: false },
@@ -453,8 +452,8 @@
           joy1Y.innerText = stickData.y;
           stickDataGlobal.x = stickData.x;
           stickDataGlobal.y = stickData.y;
-          if (!timedOut) {
-            fetch(`${serverUrl}/api/updateControls`, {
+          if (!joyTimedOut) {
+            fetch('/api/updateControls', {
               method: 'POST', // Specify the HTTP method
               body: JSON.stringify({
                 x: stickDataGlobal.x,
@@ -464,9 +463,9 @@
                 'Content-type': 'application/json; charset=UTF-8',
               },
             });
-            timedOut = true;
+            joyTimedOut = true;
             setTimeout(() => {
-              timedOut = false;
+              joyTimedOut = false;
             }, 200);
           }
         }

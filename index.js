@@ -6,7 +6,7 @@ const { EventEmitter } = require('events');
 const fs = require('fs');
 const ws = require('ws');
 
-const wss = new ws.WebSocketServer({ port: 3001 });
+const wss = new ws.WebSocketServer({ port: 3010 });
 const app = express();
 const port = 8080;
 const users = { blabla: '228228' };
@@ -100,8 +100,18 @@ app.post('/api/updateControls', (req, res) => {
 app.post('/api/updateCamAngle', (req, res) => {
   const newData = req.body;
   camAngle = newData.angle;
-  console.log('camera angle:' + newData.angle);
-  res.json({ success: true });
+  const buffer = new Int8Array(1);
+  buffer[0] = camAngle;
+
+  wss.clients.forEach(client => {
+    client.send(buffer, err => {
+      if (err) {
+        res.status(500).send(err);
+        console.error(err);
+      }
+    });
+  });
+  res.json({ camAngle });
 });
 
 app.get('/api/getControls', (req, res) => {
@@ -121,7 +131,7 @@ app.get('/frames/:imageName', (req, res) => {
   res.sendFile(imagePath);
 });
 // Handle frame upload
-//app.use(bodyParser.json({ limit: '5mb' })); 
+//app.use(bodyParser.json({ limit: '5mb' }));
 app.post('/upload', (req, res) => {
   // Decode base64 image and save it to a file
   const imageData = req.body.image;
@@ -171,4 +181,4 @@ wss.on('connection', socket => {
   });
 });
 
-console.log('WebSocket server is running on port 3000');
+console.log('WebSocket server is running on port 3010');

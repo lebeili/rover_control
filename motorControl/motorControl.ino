@@ -1,10 +1,11 @@
+#include <ESP32Servo.h>
 #include <TB6612_ESP32.h>
 #include <WebSocketsClient.h>
 #include <WiFi.h>
 
 #include "secrets.h"
 
-#define INDICATOR 14
+#define INDICATOR 15
 
 #define STBY 2
 
@@ -16,14 +17,11 @@
 #define BIN2 22
 #define PWMB 23
 
+#define SERVO 4
+
 const char *ssid = SECRET_SSID;
 const char *password = SECRET_PWD;
 const char *wsUrl = SECRET_URL;
-
-// const int MAX_SPEED = 100;
-const int MAX_SPEED = 100;
-// const int TURN_SPEED = 100;
-// const int LOW_SPEED = 30;
 
 const int offsetA = 1;
 const int offsetB = 1;
@@ -32,6 +30,8 @@ Motor motorA = Motor(AIN1, AIN2, PWMA, offsetA, STBY, 5000, 8, 1);
 Motor motorB = Motor(BIN1, BIN2, PWMB, offsetB, STBY, 5000, 8, 2);
 int speedA = 0;
 int speedB = 0;
+
+Servo servo;
 
 WebSocketsClient webSocket;
 
@@ -93,7 +93,6 @@ void handleDirectionChange(signed char rawX, signed char rawY) {
 }
 
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
-  digitalWrite(INDICATOR, HIGH);
   switch (type) {
   case WStype_DISCONNECTED:
     Serial.println("[WSc] Disconnected!\n");
@@ -115,16 +114,23 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   case WStype_BIN:
     Serial.print("[WSc] get binary length: ");
     Serial.println(length);
-    handleDirectionChange((signed char)payload[0], (signed char)payload[1]);
+    if (length == 1) {
+      // Reverse angle values as servo is installed backwards
+      servo.write(map((int)(payload[0] | 0), 0, 180, 180, 0));
+    } else if (length == 2) {
+      handleDirectionChange((signed char)payload[0], (signed char)payload[1]);
+    }
     break;
   }
-  delay(100);
-  digitalWrite(INDICATOR, LOW);
 }
 
 void setup() {
   motorA.standby();
   motorB.standby();
+
+  servo.setPeriodHertz(50);
+  servo.attach(SERVO, 1000, 2000);
+
   pinMode(INDICATOR, OUTPUT);
 
   Serial.begin(9600);
@@ -146,7 +152,7 @@ void setup() {
     delay(100);
   }
 
-  webSocket.begin(wsUrl, 3000);
+  webSocket.begin(wsUrl, 3010);
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(3000);
 }
