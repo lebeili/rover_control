@@ -3,17 +3,323 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JPEG Viewer</title>
+    <script
+      src="https://kit.fontawesome.com/f7310fb2c0.js"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.1.2/mapbox-gl.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <title>MECHA-POUTA</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Roboto', sans-serif;
+        font-weight: 300;
+        color: #505050;
+      }
+      .grid-container {
+        display: grid;
+        grid-template-columns: 30rem auto;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .sensor-data-grid {
+        display: grid;
+        grid-template-rows: repeat(2, 1fr);
+        grid-template-columns: 2fr 2fr 2fr;
+      }
+      .grid-item {
+        border: 1px solid #ddd;
+      }
+
+      .left-grid-subcontainer {
+        display: grid;
+        grid-template-rows: 25.5rem 5rem auto;
+      }
+      .right-grid-subcontainer {
+        display: grid;
+        grid-template-rows: 2fr 1.5fr;
+      }
+      .map-grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+      .grid-item i {
+        font-size: 32px;
+      }
+      .sensor-data-block {
+        border: 0.5px solid #ccc;
+        text-align: center;
+        padding: 14px;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+      }
+
+      .slider-body-container {
+        margin: 1rem;
+      }
+      #joy1Div {
+        width: 16rem;
+        height: 16rem;
+      }
+      .sensor-data-block-unit {
+        font-weight: 300;
+        font-size: 23px;
+      }
+      .joystick-container {
+        height: 100%;
+        display: flex;
+        gap: 3rem;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .joystick-state {
+        display: grid;
+        grid-template-columns: 2fr 2fr;
+        grid-gap: 1rem;
+        font-size: 2rem;
+      }
+
+      .joystick-body-container {
+        width: 25rem;
+        display: flex;
+        justify-content: center;
+      }
+
+      #jpeg-image2 {
+        max-width: 100%;
+      }
+      /********** Range Input Styles **********/
+      /*Range Reset*/
+      input[type='range'] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+        width: 23rem;
+      }
+
+      /* Removes default focus */
+      input[type='range']:focus {
+        outline: none;
+      }
+
+      /***** Chrome, Safari, Opera and Edge Chromium styles *****/
+      /* slider track */
+      input[type='range']::-webkit-slider-runnable-track {
+        background-color: #053a5f;
+        border-radius: 0.5rem;
+        height: 0.5rem;
+      }
+
+      /* slider thumb */
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        margin-top: -12px; /* Centers thumb on the track */
+
+        /*custom styles*/
+        background-color: #5cd5eb;
+        height: 2rem;
+        width: 1rem;
+      }
+
+      input[type='range']:focus::-webkit-slider-thumb {
+        border: 1px solid #053a5f;
+        outline: 3px solid #053a5f;
+        outline-offset: 0.125rem;
+      }
+
+      /******** Firefox styles ********/
+      /* slider track */
+      input[type='range']::-moz-range-track {
+        background-color: #053a5f;
+        border-radius: 0.5rem;
+        height: 0.5rem;
+      }
+
+      /* slider thumb */
+      input[type='range']::-moz-range-thumb {
+        border: none; /*Removes extra border that FF applies*/
+        border-radius: 0; /*Removes default border-radius that FF applies*/
+
+        /*custom styles*/
+        background-color: #5cd5eb;
+        height: 2rem;
+        width: 1rem;
+      }
+
+      input[type='range']:focus::-moz-range-thumb {
+        border: 1px solid #053a5f;
+        outline: 3px solid #053a5f;
+        outline-offset: 0.125rem;
+      }
+    </style>
+    <script src="joy.js"></script>
   </head>
   <body>
-    <h1>JPEG Viewer</h1>
-    <img
-      id="jpeg-image2"
-      src="http://109.204.233.11:3000/frames/latest.jpg"
-      alt="JPEG Image"
-    />
+    <div class="grid-container">
+      <div class="left-grid-subcontainer">
+        <!-- Camera  feed -->
+        <div class="grid-item">
+          <img id="jpeg-image2" src="frames/latest.jpg" alt="JPEG Image" />
+        </div>
+
+        <!-- Joystick -->
+        <div class="grid-item">
+          <div class="slider-body-container">
+            <i
+              class="fa-solid fa-video-camera"
+              aria-hidden="true"
+              style="
+                display: inline;
+                font-size: 22px;
+                margin: 12px !important;
+                margin-top: 11px;
+              "
+            ></i>
+            <input
+              type="range"
+              class="slider"
+              id="camera_angle"
+              min="0"
+              max="180"
+              value="90"
+              style="display: inline; /* margin-bottom: 11px; */"
+            />
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="joystick-container">
+            <div class="joystick-state">
+              <div><span>X: </span><span id="joy1X">0</span></div>
+              <div><span>Y: </span><span id="joy1Y">0</span></div>
+            </div>
+            <div class="joystick-body-container">
+              <div id="joy1Div"></div>
+            </div>
+            <input id="joy1PosizioneX" type="hidden" />
+            <input id="joy1PosizioneY" type="hidden" />
+            <input id="joy1Direzione" type="hidden" />
+          </div>
+        </div>
+      </div>
+      <div class="right-grid-subcontainer">
+        <div class="map-grid-container">
+          <!-- ISS map -->
+          <div class="grid-item" id="map-container"></div>
+
+          <!-- Big map -->
+          <div class="grid-item">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://api.mapbox.com/styles/v1/lebedei/clsbx922m00ck01qzc9cc42q1.html?title=false&access_token=pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w&zoomwheel=false#13.84/60.17619/24.80732"
+              title="Streets"
+              style="border: none"
+            ></iframe>
+          </div>
+        </div>
+
+        <!-- Sensor data grid  -->
+        <div class="grid-item sensor-data-grid">
+          <div class="sensor-data-block">
+            <i class="fa-solid fa-temperature-low"></i>
+            <div class="sensor-data-block-title">Temperature</div>
+            <div style="font-size: 30px; font-weight: 700">
+              <span id="temperature_value" class="sensor-data-block-value"
+                >21</span
+              >
+              <span class="sensor-data-block-unit">°C</span>
+            </div>
+          </div>
+          <div class="sensor-data-block">
+            <i class="fa-solid fa-wind"></i>
+            <div class="sensor-data-block-title" style="font-size: 15px">
+              Atmospheric pressure
+            </div>
+            <div style="font-size: 23px; font-weight: 700">
+              <span id="pressure_value" class="sensor-data-block-value"
+                >101325</span
+              >
+              <span class="sensor-data-block-unit">Pa</span>
+            </div>
+          </div>
+          <div class="sensor-data-block">
+            <i class="fa-solid fa-sun"></i>
+            <div class="sensor-data-block-title">Brightness</div>
+            <div style="font-size: 30px; font-weight: 700">
+              <span id="brightness_value" class="sensor-data-block-value"
+                >808</span
+              >
+              <span class="sensor-data-block-unit">lm</span>
+            </div>
+          </div>
+          <div class="sensor-data-block">
+            <i class="fa-solid fa-gauge-high"></i>
+            <div class="sensor-data-block-title">Speed</div>
+            <div style="font-size: 30px; font-weight: 700">
+              <span id="speed_value" class="sensor-data-block-value">2</span>
+              <span class="sensor-data-block-unit">m/s</span>
+            </div>
+          </div>
+          <div class="sensor-data-block">
+            <i class="fa-solid fa-head-side-mask"></i>
+            <div class="sensor-data-block-title">Air quality</div>
+            <div style="font-size: 30px; font-weight: 700">
+              <span class="sensor-data-block-value">0.8</span>
+              <span class="sensor-data-block-unit"></span>
+            </div>
+          </div>
+          <div class="sensor-data-block">
+            <i class="fa-solid fa-location-crosshairs"></i>
+            <div class="sensor-data-block-title">Geolocation</div>
+            <div style="font-size: 30px; font-weight: 700">
+              <span id="location_value" class="sensor-data-block-value"
+                >21</span
+              >
+              <span class="sensor-data-block-unit"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script>
+      // EventSource to listen for server-sent events
+      const eventSource = new EventSource('/events');
+      var gps_location = [40, 40];
+
+      // Update data on receiving server-sent events
+      eventSource.onmessage = event => {
+        const data = JSON.parse(event.data);
+        document.getElementById('temperature_value').innerText =
+          `${data.temperature}`;
+        document.getElementById('pressure_value').innerText =
+          `${data.pressure}`;
+        document.getElementById('brightness_value').innerText =
+          `${data.brightness}`;
+        document.getElementById('speed_value').innerText = `${data.speed}`;
+        document.getElementById('location_value').innerText =
+          `${data.location}`;
+
+        gps_location = data.location.split(',');
+        gps_location[0] = parseFloat(gps_location[0]);
+        gps_location[1] = parseFloat(gps_location[1]);
+      };
+
       function updateImage() {
         const randomQuery = `?${Math.random()}`;
         // Update the image source with the same filename but a different query parameter
@@ -23,6 +329,147 @@
 
       // Update the image every 1000 ms (adjust as needed)
       setInterval(updateImage, 100);
+
+      mapboxgl.accessToken =
+        'pk.eyJ1IjoibGViZWRlaSIsImEiOiJjbHJsMjh2b3UwbW5qMmtrMGN2Zzh3ZnZkIn0.mgAxc18VxnZtgJr8zwVg4w';
+      const map = new mapboxgl.Map({
+        container: 'map-container',
+        // Choose from Mapbox's core styles, or make your own style with Mapbox Studio
+        style: 'mapbox://styles/mapbox/streets-v12',
+        zoom: 4.4,
+      });
+
+      map.on('load', async () => {
+        // Get the initial location of the International Space Station (ISS).
+        const geojson = await getLocation();
+        map.loadImage('/public/rover.png', (error, image) => {
+          if (error) throw error;
+
+          // Add the image to the map style.
+          map.addImage('rover', image);
+        });
+        // Add the ISS location as a source.
+        map.addSource('iss', {
+          type: 'geojson',
+          data: geojson,
+        });
+
+        // Add the rocket symbol layer to the map.
+        map.addLayer({
+          id: 'iss',
+          type: 'symbol',
+          source: 'iss',
+          layout: {
+            'icon-image': 'rover', // reference the image
+            'icon-size': 0.6,
+          },
+        });
+
+        // Update the source from the API every 2 seconds.
+        const updateSource = setInterval(async () => {
+          const geojson = await getLocation(updateSource);
+          map.getSource('iss').setData(geojson);
+        }, 2000);
+
+        async function getLocation(updateSource) {
+          // Make a GET request to the API and return the location of the ISS.
+          try {
+            const response = await fetch(
+              'https://api.wheretheiss.at/v1/satellites/25544',
+              { method: 'GET' }
+            );
+            const { latitude, longitude } = await response.json();
+            // Fly the map to the location.
+            map.flyTo({
+              center: [gps_location[1], gps_location[0]],
+              speed: 0.8,
+              zoom: 17,
+            });
+            // Return the location of the ISS as GeoJSON.
+
+            return {
+              type: 'FeatureCollection',
+              features: [
+                {
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [gps_location[1], gps_location[0]],
+                  },
+                },
+              ],
+            };
+          } catch (err) {
+            // If the updateSource interval is defined, clear the interval to stop updating the source.
+            if (updateSource) clearInterval(updateSource);
+            throw new Error(err);
+          }
+        }
+      });
+    </script>
+
+    <script>
+      let angleSlider = document.getElementById('camera_angle');
+      let camTimedOut = false;
+      angleSlider.addEventListener(
+        'input',
+        function () {
+          if (!camTimedOut) {
+            fetch('/api/updateCamAngle', {
+              method: 'POST', // Specify the HTTP method
+              body: JSON.stringify({
+                angle: angleSlider.value,
+              }),
+              headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+              },
+            });
+            camTimedOut = true;
+            setTimeout(() => {
+              camTimedOut = false;
+            }, 100);
+          }
+        },
+        false
+      );
+    </script>
+    <script>
+      let joy1IinputPosX = document.getElementById('joy1PosizioneX');
+      let joy1InputPosY = document.getElementById('joy1PosizioneY');
+      let joy1Direzione = document.getElementById('joy1Direzione');
+      let joy1X = document.getElementById('joy1X');
+      let joy1Y = document.getElementById('joy1Y');
+      let stickDataGlobal = { x: 0, y: 0 };
+      let joyTimedOut = false;
+      let Joy1 = new JoyStick(
+        'joy1Div',
+        { autoReturnToCenter: true },
+        function (stickData) {
+          joy1IinputPosX.value = stickData.xPosition;
+          joy1InputPosY.value = stickData.yPosition;
+          joy1Direzione.value = stickData.cardinalDirection;
+          joy1X.innerText = stickData.x;
+          joy1Y.innerText = stickData.y;
+          stickDataGlobal.x = stickData.x;
+          stickDataGlobal.y = stickData.y;
+          if (!joyTimedOut) {
+            fetch('/api/updateControls', {
+              method: 'POST', // Specify the HTTP method
+              body: JSON.stringify({
+                x: stickDataGlobal.x,
+                y: stickDataGlobal.y,
+              }),
+              headers: {
+                'Content-type': 'application/json; charset=UTF-8',
+              },
+            });
+            joyTimedOut = true;
+            setTimeout(() => {
+              joyTimedOut = false;
+            }, 200);
+          }
+        }
+      );
     </script>
   </body>
 </html>

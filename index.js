@@ -6,9 +6,12 @@ const { EventEmitter } = require('events');
 const fs = require('fs');
 const ws = require('ws');
 
-const wss = new ws.WebSocketServer({ port: 3010 });
+const expressPort = 8080;
+const wssPort = 3010;
+
+const wss = new ws.WebSocketServer({ port: wssPort });
 const app = express();
-const port = 8080;
+
 const users = { blabla: '228228' };
 
 app.use(express.static('public'));
@@ -20,8 +23,8 @@ let camAngle = 90;
 // Create an EventEmitter to handle SSE connections
 const eventEmitter = new EventEmitter();
 
-// Middleware to parse JSON data
-app.use(bodyParser.json());
+// Use body-parser middleware to parse request bodies
+app.use(bodyParser.json({ limit: '100mb' }));
 
 const basicAuthMiddleware = basicAuth({
   users: users,
@@ -29,21 +32,12 @@ const basicAuthMiddleware = basicAuth({
   unauthorizedResponse: 'Unauthorized Access!', // Custom unauthorized response
 });
 
-// Use basicAuthMiddleware for the path you want to protect
-app.use('/rover', basicAuthMiddleware);
+// Use authentication middleware for base paths
+app.use('/', basicAuthMiddleware);
 app.use('/mobile', basicAuthMiddleware);
 
 // Serve static files (HTML, JS, CSS, etc.)
 app.use(express.static(path.join(__dirname, '')));
-
-// Serve the HTML page for the root path
-app.get('/rover', (req, res) => {
-  res.sendFile(path.join(__dirname, '', 'rover.html'));
-});
-
-app.get('/mobile', (req, res) => {
-  res.sendFile(path.join(__dirname, '', 'mobile.html'));
-});
 
 // SSE endpoint to send real-time updates
 app.get('/events', (req, res) => {
@@ -75,7 +69,7 @@ app.post('/api/updateData', (req, res) => {
   res.send(camAngle.toString());
 });
 
-// API endpoint to receive data from the client
+// API endpoint for controlling rover movement
 app.post('/api/updateControls', (req, res) => {
   const newData = req.body;
   x = newData.x;
@@ -96,7 +90,7 @@ app.post('/api/updateControls', (req, res) => {
   res.json({ x, y });
 });
 
-// API endpoint to receive data from the client
+// API endpoint for controlling rover camera angle
 app.post('/api/updateCamAngle', (req, res) => {
   const newData = req.body;
   camAngle = newData.angle;
@@ -114,14 +108,6 @@ app.post('/api/updateCamAngle', (req, res) => {
   res.json({ camAngle });
 });
 
-app.get('/api/getControls', (req, res) => {
-  // console.log("responded with controls data");
-  res.json({ x, y, camAngle });
-});
-
-// Use body-parser middleware to parse request bodies
-app.use(bodyParser.json({ limit: '100mb' }));
-
 // Serve JPEG files based on the requested path
 app.get('/frames/:imageName', (req, res) => {
   const imageName = req.params.imageName;
@@ -130,32 +116,19 @@ app.get('/frames/:imageName', (req, res) => {
   // Send the JPEG file
   res.sendFile(imagePath);
 });
-// Handle frame upload
-//app.use(bodyParser.json({ limit: '5mb' }));
+
+// Handle video frame upload
 app.post('/upload', (req, res) => {
   // Decode base64 image and save it to a file
   const imageData = req.body.image;
   const imageBuffer = Buffer.from(imageData, 'base64');
 
-  // Save the image to a file (you can customize this part)
+  // Save the image to a file
   const fileName = `latest.jpg`;
   fs.writeFileSync(path.join(__dirname, 'frames', fileName), imageBuffer);
 
   // Respond with success message
   res.status(200).send('Frame received successfully!');
-});
-
-app.post('/setDirection/:dir', (req, res) => {
-  const direction = req.params.dir;
-  wss.clients.forEach(client => {
-    client.send(direction, err => {
-      if (err) {
-        res.status(500).send(err);
-        console.error(err);
-      }
-    });
-  });
-  res.status(200).send(`set direction ${direction}`);
 });
 
 app.listen(port, () => {
@@ -181,4 +154,4 @@ wss.on('connection', socket => {
   });
 });
 
-console.log('WebSocket server is running on port 3010');
+console.log(`WebSocket server is running on port ${wssPort}`);
