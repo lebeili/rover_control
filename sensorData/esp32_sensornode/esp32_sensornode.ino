@@ -57,7 +57,7 @@ void setup() {
 
 
 
-pinMode(34, INPUT);
+	pinMode(34, INPUT);
 
 
 
