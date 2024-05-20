@@ -19,9 +19,9 @@
 
 #define SERVO 4
 
-const char *ssid = SECRET_SSID;
-const char *password = SECRET_PWD;
-const char *wsUrl = SECRET_URL;
+const char *ssid = "aalto open";
+const char *password = "";
+const char *wsUrl = "109.204.233.236:3000";
 
 const int offsetA = 1;
 const int offsetB = 1;
