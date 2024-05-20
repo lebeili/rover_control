@@ -443,7 +443,7 @@
       let joyTimedOut = false;
       let Joy1 = new JoyStick(
         'joy1Div',
-        { autoReturnToCenter: false },
+        { autoReturnToCenter: true },
         function (stickData) {
           joy1IinputPosX.value = stickData.xPosition;
           joy1InputPosY.value = stickData.yPosition;
