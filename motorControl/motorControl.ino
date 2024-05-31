@@ -7,10 +7,11 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <WiFiMulti.h>
-#define SERVER_IP "109.204.233.236:8080"
+#define SERVER_IP "109.204.233.236:8080" // put your server address here
 #ifndef STASSID
-#define STASSID "Tuoppias"
-#define STAPSK "k2tmjv9i"
+
+#define STASSID "aalto open"
+#define STAPSK ""
 #endif
 WiFiMulti wifiMulti;
 #include <Adafruit_BMP280.h>
@@ -34,11 +35,15 @@ SoftwareSerial ss(RXPin, TXPin);
 
 
 //#include "secrets.h"
+// WiFi SSID & password + server URL are pulled from a secrets file to not leak
+// them to github
+//#include "secrets.h"
 
+// LED indicator pin
 #define INDICATOR 15
 
+// Pin definitions for TB6612FNG motor controller wiring
 #define STBY 2
-
 #define AIN1 16
 #define AIN2 17
 #define PWMA 18
@@ -47,11 +52,14 @@ SoftwareSerial ss(RXPin, TXPin);
 #define BIN2 22
 #define PWMB 23
 
+// Servo motor data pin
 #define SERVO 4
 
-const char *ssid = "Tuoppias";
-const char *password = "k2tmjv9i";
+
+const char *ssid = "aalto open";
+const char *password = "";
 const char *wsUrl = "109.204.233.236";
+
 
 const int offsetA = 1;
 const int offsetB = 1;
@@ -65,7 +73,8 @@ Servo servo;
 
 WebSocketsClient webSocket;
 
-// Do lerp for changing motor speeds to reduce back EMF
+// Accelerate and decelerate motor speed with linear interpolation
+// to reduce back-EMF caused by motor coils
 void lerpChangeMotors(int targetB, int targetA) {
   Serial.print("LERPing to A: ");
   Serial.print(targetA);
@@ -85,18 +94,28 @@ void lerpChangeMotors(int targetB, int targetA) {
     speedA += stepA;
     speedB += stepB;
     delay(50);
-    motorA.drive(speedA + stepA);
-    motorB.drive(speedB + stepB);
+    motorA.drive((speedA + stepA)*2);
+    motorB.drive((speedB + stepB)*2);
   }
 
   speedA = targetA;
   speedB = targetB;
 
-  motorA.drive(targetA);
-  motorB.drive(targetB);
+  motorA.drive(targetA*2);
+  motorB.drive(targetB*2);
 }
 
+//
+// Take X and Y values from joystick input and calculate
+// how the motors should react to them:
+//
+// Roughly speaking, the higher the (absolute value of) Y, the faster the rover
+// should move either forward or backward. The higher the value of X, the more
+// the rover should be turning either left or right.
+//
 void handleDirectionChange(signed char rawX, signed char rawY) {
+  // values are 8bit, convert them to 32bit integers for easier use down the
+  // line
   int x = (int)(rawX | 0);
   int y = (int)(rawY | 0);
 
@@ -110,18 +129,22 @@ void handleDirectionChange(signed char rawX, signed char rawY) {
     return;
   }
 
-  int adjX = map(abs(x), 1, 100, y, -y);
+  // The higher the X, the further its value should be from the value of Y to
+  // turn the rover more or less. The furthest possible is -Y, so map X to a
+  // range within [-Y, Y]
+  int adjustedX = map(abs(x), 1, 100, y, -y);
 
-  // Turning left
+  // Turning left, X becomes the value of the left motors
   if (x < 0) {
-    lerpChangeMotors(adjX, y);
+    lerpChangeMotors(adjustedX, y);
   }
-  // Turning right
+  // Turning right, same for the right motors
   else if (x > 0) {
-    lerpChangeMotors(y, adjX);
+    lerpChangeMotors(y, adjustedX);
   }
 }
 
+// WebSocket event handler
 void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   switch (type) {
   case WStype_DISCONNECTED:
@@ -144,16 +167,21 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   case WStype_BIN:
     Serial.print("[WSc] get binary length: ");
     Serial.println(length);
+    // Length == 1 means the command is for the camera servo angle (value is a
+    // degree within [0, 180])
     if (length == 1) {
       // Reverse angle values as servo is installed backwards
       servo.write(map((int)(payload[0] | 0), 0, 180, 180, 0));
-    } else if (length == 2) {
+    }
+    // Length == 2 means the command is for motors. [0] is X and [1] is Y
+    else if (length == 2) {
       handleDirectionChange((signed char)payload[0], (signed char)payload[1]);
     }
     break;
   }
 }
 
+// Init motors, and connect to WiFi + WebSocket server
 void setup() {
     
   Serial.begin(9600);
@@ -215,6 +243,7 @@ void setup() {
   motorA.standby();
   motorB.standby();
 
+  // Standard servo parameters
   servo.setPeriodHertz(50);
   servo.attach(SERVO, 1000, 2000);
 
@@ -238,6 +267,7 @@ void setup() {
     delay(100);
   }
 
+  // Connect to WebSocket
   webSocket.begin(wsUrl, 3010);
   webSocket.onEvent(webSocketEvent);
   webSocket.setReconnectInterval(3000);
