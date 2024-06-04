@@ -1,40 +1,44 @@
-#include <ESP32Servo.h>
-#include <TB6612_ESP32.h>
-#include <WebSocketsClient.h>
-#include <WiFi.h>
-
-
-#include <WiFi.h>
-#include <HTTPClient.h>
-#include <WiFiMulti.h>
-#define SERVER_IP "109.204.233.236:8080" // put your server address here
-#ifndef STASSID
-
-#define STASSID "aalto open"
-#define STAPSK ""
-#endif
-WiFiMulti wifiMulti;
+// Sensors + actuators drivers:
 #include <Adafruit_BMP280.h>
 #include <Adafruit_MPU6050.h>
 #include <TinyGPSPlus.h>
-#include <SoftwareSerial.h>
+#include <ESP32Servo.h> // ESP32 library for controlling servo motors (Arduino built in one doesn't work)
+#include <TB6612_ESP32.h> // The motor driver IC's driver
+
+// Networking drivers:
+#include <WebSocketsClient.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <WiFiMulti.h>
+
+#include <SoftwareSerial.h> // Software serial for the GPS module communication
+
+
+#define SERVER_IP "109.204.233.236:8080" // put your server address here
+#ifndef STASSID
+  #define STASSID "aalto open"  // and your wi-fi credentials here:
+  #define STAPSK ""
+#endif
+const char *ssid = "aalto open";
+const char *password = "";
+const char *wsUrl = "109.204.233.236";
+
+WiFiMulti wifiMulti;
 #define BMP_SCK  (13)
 #define BMP_MISO (12)
 #define BMP_MOSI (11)
 #define BMP_CS   (10)
 Adafruit_BMP280 bmp;
 
-
-
 Adafruit_MPU6050 mpu;
 Adafruit_Sensor *mpu_temp, *mpu_accel, *mpu_gyro;
+
 static const int RXPin = 13, TXPin = 12;
 static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
 SoftwareSerial ss(RXPin, TXPin);
 
 
-//#include "secrets.h"
 // WiFi SSID & password + server URL are pulled from a secrets file to not leak
 // them to github
 //#include "secrets.h"
@@ -56,16 +60,12 @@ SoftwareSerial ss(RXPin, TXPin);
 #define SERVO 4
 
 
-const char *ssid = "aalto open";
-const char *password = "";
-const char *wsUrl = "109.204.233.236";
-
-
 const int offsetA = 1;
 const int offsetB = 1;
 
 Motor motorA = Motor(AIN1, AIN2, PWMA, offsetA, STBY, 5000, 8, 1);
 Motor motorB = Motor(BIN1, BIN2, PWMB, offsetB, STBY, 5000, 8, 2);
+
 int speedA = 0;
 int speedB = 0;
 
@@ -273,16 +273,6 @@ void setup() {
   webSocket.setReconnectInterval(3000);
 }
 
-//void loop() { webSocket.loop(); }
-
-
-
-
-
-
-
-
-
 
 
 void loop() {
@@ -355,57 +345,11 @@ void loop() {
   Serial.print(temp.temperature);
   Serial.println(" deg C");
 
-  /* Display the results (acceleration is measured in m/s^2) */
-/*Serial.print("Accel X: ");
-  Serial.print(accel.acceleration.x);
-  Serial.print(" \tY: ");
-  Serial.print(accel.acceleration.y);
-  Serial.print(" \tZ: ");
-  Serial.print(accel.acceleration.z);
-  Serial.println(" m/s^2 ");
-*/
-  /* Display the results (rotation is measured in rad/s) */
- /* Serial.print("Gyro X: ");
-  Serial.print(gyro.gyro.x);
-  Serial.print(" \tY: ");
-  Serial.print(gyro.gyro.y);
-  Serial.print(" \tZ: ");
-  Serial.print(gyro.gyro.z);
-  Serial.println(" radians/s ");
-  Serial.println();
-*/
-
 
   webSocket.loop();
 
 
 static const double LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
-/*Serial.print("Satellite value:");
-  printInt(gps.satellites.value(), gps.satellites.isValid(), 5);
-  Serial.print("\nHDOP:");
-  printFloat(gps.hdop.hdop(), gps.hdop.isValid(), 6, 1);
-  Serial.print("\nLatitude:");
-  printFloat(gps.location.lat(), gps.location.isValid(), 11, 6);
-  Serial.print("\nLongitude:");
-  printFloat(gps.location.lng(), gps.location.isValid(), 12, 6);
-  Serial.print("\nAge:");
-  printInt(gps.location.age(), gps.location.isValid(), 5);
-  Serial.print("\nDate and time:");
-  printDateTime(gps.date, gps.time);
-  Serial.print("\nAltitude:");
-  printFloat(gps.altitude.meters(), gps.altitude.isValid(), 7, 2);
-  Serial.print("\nCourse:");
-  printFloat(gps.course.deg(), gps.course.isValid(), 7, 2);
-  Serial.print("\nSpeed:");
-  printFloat(gps.speed.kmph(), gps.speed.isValid(), 6, 2);
-Serial.print("\nCardinal:");  
-  printStr(gps.course.isValid() ? TinyGPSPlus::cardinal(gps.course.deg()) : "*** ", 6);
-
-  
-  Serial.println();
-Serial.println("--------------------------------------");  */
-  //smartDelay(500);
-
 
   if (millis() > 5000 && gps.charsProcessed() < 10) {
     Serial.println(F("No GPS data received: check wiring"));
@@ -494,12 +438,9 @@ static void printStr(const char *str, int len) {
 
 void hexdump(const void *mem, uint32_t len, uint8_t cols = 16) {
   const uint8_t* src = (const uint8_t*) mem;
-//  sprintf("\n[HEXDUMP] Address: 0x%08X len: 0x%X (%d)", (ptrdiff_t)src, len, len);
   for(uint32_t i = 0; i < len; i++) {
     if(i % cols == 0) {
-//      sprintf("\n[0x%08X] 0x%08X: ", (ptrdiff_t)src, i);
     }
- //   sprintf("%02X ", *src);
     src++;
   }
   Serial.print("\n");
