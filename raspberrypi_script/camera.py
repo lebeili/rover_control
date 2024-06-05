@@ -1,0 +1,137 @@
+#!/usr/bin/python3
+
+# Mostly copied from https://picamera.readthedocs.io/en/release-1.13/recipes2.html
+# Run this script, then point a web browser at http:<this-ip-address>:8000
+# Note: needs simplejpeg to be installed (pip3 install simplejpeg).
+
+
+import logging
+import io
+import json  
+import socketserver
+from http import server
+import time
+from threading import Condition
+import requests
+import base64
+from picamera2 import Picamera2
+from picamera2.encoders import JpegEncoder
+from picamera2.outputs import FileOutput
+REMOTE_SERVER_URL = 'http://109.204.233.236:8080/upload'
+BOUNDARY = 'frameboundary'
+PAGE = """\
+<html>
+<head>
+<title>picamera2 MJPEG streaming demo</title>
+</head>
+<body>
+<h1>Picamera2 MJPEG Streaming Demo</h1>
+<img src="stream.mjpg" width="640" height="480" />
+</body>
+</html>
+"""
+
+
+class StreamingOutput(io.BufferedIOBase):
+    def __init__(self):
+        self.frame = None
+        self.condition = Condition()
+
+    def write(self, buf):
+        with self.condition:
+            self.frame = buf
+            self.condition.notify_all()
+
+
+class StreamingHandler(server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/':
+            self.send_response(301)
+            self.send_header('Location', '/index.html')
+            self.end_headers()
+        elif self.path == '/index.html':
+            content = PAGE.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html')
+            self.send_header('Content-Length', len(content))
+            self.end_headers()
+            self.wfile.write(content)
+        elif self.path == '/stream.mjpg':
+            self.send_response(200)
+            self.send_header('Age', 0)
+            self.send_header('Cache-Control', 'no-cache, private')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=FRAME')
+            self.end_headers()
+            try:
+                while True:
+                    with output.condition:
+                        output.condition.wait()
+                        frame = output.frame
+                    self.wfile.write(b'--FRAME\r\n')
+                    self.send_header('Content-Type', 'image/jpeg')
+                    self.send_header('Content-Length', len(frame))
+                    self.end_headers()
+                    self.wfile.write(frame)
+                    self.wfile.write(b'\r\n')
+                    im_b64 = base64.b64encode(frame).decode("utf8")
+
+                    headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+  
+                    payload = json.dumps({"image": im_b64, "other_key": "value"})
+                    response = requests.post(REMOTE_SERVER_URL, data=payload, headers=headers)
+                    try:
+                    	data = response.json()     
+                    	#print(data)                
+                    except requests.exceptions.RequestException:
+                    	#print(response.text)
+                        print('failed')
+
+
+            except Exception as e:
+                logging.warning(
+                    'Removed streaming client %s: %s',
+                    self.client_address, str(e))
+        else:
+            self.send_error(404)
+            self.end_headers()
+
+
+class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
+    allow_reuse_address = True
+    daemon_threads = True
+def sendData():
+	while True:
+		with output.condition:
+			output.condition.wait()
+			frame = output.frame
+		im_b64 = base64.b64encode(frame).decode("utf8")
+
+		headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
+		payload = json.dumps({"image": im_b64, "other_key": "value"})
+		response = requests.post(REMOTE_SERVER_URL, data=payload, headers=headers)
+		try:
+			data = response.json()     
+			#print(data)                
+		except requests.exceptions.RequestException:
+			print('')
+			#print(response.text)
+            
+picam2 = Picamera2()
+picam2.configure(picam2.create_video_configuration(main={"size": (1080, 920)}))
+output = StreamingOutput()
+picam2.start_recording(JpegEncoder(), FileOutput(output))
+
+#try:
+#    address = ('', 8000)
+#    server = StreamingServer(address, StreamingHandler)
+#    server.serve_forever()
+#finally:
+#    picam2.stop_recording()
+
+sendData()
+#while True:
+    
+ #   print('test')
+  #  time.sleep(2)
