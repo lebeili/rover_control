@@ -23,16 +23,21 @@ const char *ssid = "aalto open";
 const char *password = "";
 const char *wsUrl = "109.204.233.236";
 
+// Wi-Fi declaration
 WiFiMulti wifiMulti;
+
+// BMP sensor declarations:
 #define BMP_SCK  (13)
 #define BMP_MISO (12)
 #define BMP_MOSI (11)
 #define BMP_CS   (10)
 Adafruit_BMP280 bmp;
 
+// IMU sensor declarations
 Adafruit_MPU6050 mpu;
 Adafruit_Sensor *mpu_temp, *mpu_accel, *mpu_gyro;
 
+// GPS module UART configuration:
 static const int RXPin = 13, TXPin = 12;
 static const uint32_t GPSBaud = 9600;
 TinyGPSPlus gps;
@@ -43,34 +48,31 @@ SoftwareSerial ss(RXPin, TXPin);
 // them to github
 //#include "secrets.h"
 
-// LED indicator pin
+// LED indicator pin:
 #define INDICATOR 15
 
-// Pin definitions for TB6612FNG motor controller wiring
+// Pin definitions for TB6612FNG motor controller wiring:
 #define STBY 2
 #define AIN1 16
 #define AIN2 17
 #define PWMA 18
-
 #define BIN1 21
 #define BIN2 22
 #define PWMB 23
 
-// Servo motor data pin
+// Camera servo motor data configuration:
 #define SERVO 4
+Servo servo;
 
-
+// Motor driver data initialization:
 const int offsetA = 1;
 const int offsetB = 1;
-
 Motor motorA = Motor(AIN1, AIN2, PWMA, offsetA, STBY, 5000, 8, 1);
 Motor motorB = Motor(BIN1, BIN2, PWMB, offsetB, STBY, 5000, 8, 2);
-
 int speedA = 0;
 int speedB = 0;
 
-Servo servo;
-
+// WebSocket library declaration
 WebSocketsClient webSocket;
 
 // Accelerate and decelerate motor speed with linear interpolation
@@ -181,7 +183,7 @@ void webSocketEvent(WStype_t type, uint8_t *payload, size_t length) {
   }
 }
 
-// Init motors, and connect to WiFi + WebSocket server
+// Init motors, sensors and connect to WiFi + WebSocket server
 void setup() {
     
   Serial.begin(9600);
@@ -237,7 +239,7 @@ void setup() {
 
 
 
-    ss.begin(GPSBaud);
+  ss.begin(GPSBaud);
 
     
   motorA.standby();
@@ -276,16 +278,19 @@ void setup() {
 
 
 void loop() {
+  // Launch websocket loop to update the controls data:
   webSocket.loop();
-   //  /* Get a new normalized sensor event */
+
+  // IMU sensor data declaration:
   sensors_event_t accel;
   sensors_event_t gyro;
   sensors_event_t temp;
   mpu_temp->getEvent(&temp);
   mpu_accel->getEvent(&accel);
   mpu_gyro->getEvent(&gyro);
- if ((wifiMulti.run() == WL_CONNECTED)) {
 
+  // Send the data to the server:
+ if ((wifiMulti.run() == WL_CONNECTED)) {
     HTTPClient http;
 
     Serial.print("[HTTP] begin...\n");
@@ -315,12 +320,13 @@ void loop() {
 
     http.end();
   }
-
+  
+  // Launch websocket loop to update the controls data:
   webSocket.loop();
 
   // must call this to wake sensor up and get new measurement data
   // it blocks until measurement is complete
- if (bmp.takeForcedMeasurement()) {
+   if (bmp.takeForcedMeasurement()) {
     // can now print out the new measurements
     Serial.print(F("Temperature = "));
     Serial.print(bmp.readTemperature());
@@ -341,15 +347,15 @@ void loop() {
   }
 
 
- Serial.print("Temperature ");
+  Serial.print("Temperature ");
   Serial.print(temp.temperature);
   Serial.println(" deg C");
 
-
+  // Launch websocket loop to update the controls data:
   webSocket.loop();
 
 
-static const double LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
+  static const double LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
 
   if (millis() > 5000 && gps.charsProcessed() < 10) {
     Serial.println(F("No GPS data received: check wiring"));
@@ -358,7 +364,7 @@ static const double LONDON_LAT = 51.508131, LONDON_LON = -0.128002;
 
 
 
-
+//Custom functions for the GPS module:
 
 // This custom version of delay() ensures that the gps object
 // is being "fed".
