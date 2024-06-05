@@ -17,6 +17,8 @@ import base64
 from picamera2 import Picamera2
 from picamera2.encoders import JpegEncoder
 from picamera2.outputs import FileOutput
+
+# Place your server's address here:
 REMOTE_SERVER_URL = 'http://109.204.233.236:8080/upload'
 BOUNDARY = 'frameboundary'
 PAGE = """\
@@ -41,7 +43,6 @@ class StreamingOutput(io.BufferedIOBase):
         with self.condition:
             self.frame = buf
             self.condition.notify_all()
-
 
 class StreamingHandler(server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -96,10 +97,10 @@ class StreamingHandler(server.BaseHTTPRequestHandler):
             self.send_error(404)
             self.end_headers()
 
-
 class StreamingServer(socketserver.ThreadingMixIn, server.HTTPServer):
     allow_reuse_address = True
     daemon_threads = True
+	
 def sendData():
 	while True:
 		with output.condition:
@@ -117,21 +118,14 @@ def sendData():
 		except requests.exceptions.RequestException:
 			print('')
 			#print(response.text)
-            
+
+# Launch the script:
+
+# Camera initialization:
 picam2 = Picamera2()
 picam2.configure(picam2.create_video_configuration(main={"size": (1080, 920)}))
 output = StreamingOutput()
 picam2.start_recording(JpegEncoder(), FileOutput(output))
 
-#try:
-#    address = ('', 8000)
-#    server = StreamingServer(address, StreamingHandler)
-#    server.serve_forever()
-#finally:
-#    picam2.stop_recording()
-
+# Send the data:
 sendData()
-#while True:
-    
- #   print('test')
-  #  time.sleep(2)
